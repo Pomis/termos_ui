@@ -2,8 +2,8 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:hugeicons/hugeicons.dart';
 
+import '../core/termos_icon_slot.dart';
 import '../core/termos_aligned_builder.dart';
 import '../core/termos_tap_target.dart';
 import '../painters/glow_top_border_painter.dart';
@@ -20,7 +20,7 @@ class TermosSegmentedItem {
   });
 
   final String label;
-  final List<List<dynamic>>? icon;
+  final Widget? icon;
 }
 
 /// Horizontal segmented control with shared top-edge glow and [TermosGroup] alignment.
@@ -142,10 +142,10 @@ class _TermosSegmentedSelectorState extends State<TermosSegmentedSelector>
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               if (widget.items[i].icon != null) ...[
-                                HugeIcon(
+                                TermosIconSlot(
                                   icon: widget.items[i].icon!,
-                                  color: i == sel ? colors.primary : colors.textMuted,
-                                  size: metrics.buttonIconSize,
+                                  tintColor: i == sel ? colors.primary : colors.textMuted,
+                                  slotSize: metrics.buttonIconSize,
                                 ),
                                 SizedBox(width: metrics.buttonIconSpacing),
                               ],

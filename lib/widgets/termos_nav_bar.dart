@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/dot_grid/dot_grid_controller.dart';
 import '../core/dot_grid/dot_grid_widget.dart';
-import 'package:hugeicons/hugeicons.dart';
+import '../core/termos_icon_slot.dart';
 
 import '../painters/glow_top_border_painter.dart';
 import '../painters/reactive_starfield_painter.dart';
@@ -19,7 +19,7 @@ class TermosNavBarItem {
     required this.color,
   });
 
-  final List<List<dynamic>> icon;
+  final Widget icon;
   final String label;
   final Color color;
 }
@@ -485,7 +485,7 @@ class _NavItem extends StatelessWidget {
     required this.metrics,
   });
 
-  final List<List<dynamic>> icon;
+  final Widget icon;
   final String label;
   final Color color;
   final bool selected;
@@ -516,7 +516,11 @@ class _NavItem extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    HugeIcon(icon: icon, color: iconColor, size: metrics.navBarIconSize),
+                    TermosIconSlot(
+                      icon: icon,
+                      tintColor: iconColor,
+                      slotSize: metrics.navBarIconSize,
+                    ),
                     SizedBox(height: metrics.navBarIconLabelGap),
                     Text(
                       label,

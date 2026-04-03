@@ -4,8 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../core/dot_grid/dot_grid_controller.dart';
-import 'package:hugeicons/hugeicons.dart';
-
+import '../core/termos_icon_slot.dart';
 import '../core/termos_aligned_builder.dart';
 import '../core/termos_tap_target.dart';
 import '../painters/reactive_starfield_painter.dart';
@@ -51,7 +50,7 @@ class TermosButton extends StatefulWidget {
 
   final Text label;
   final VoidCallback? onTap;
-  final List<List<dynamic>>? icon;
+  final Widget? icon;
   final bool enabled;
   final bool isLoading;
   final String? loadingLabel;
@@ -59,7 +58,7 @@ class TermosButton extends StatefulWidget {
   final bool savedState;
   final bool allowTapWhenSaved;
   final String? savedLabel;
-  final List<List<dynamic>>? savedIcon;
+  final Widget? savedIcon;
   final double? height;
   final double? width;
   /// When true (default), the button fills available horizontal space. When false,
@@ -313,7 +312,11 @@ class _TermosButtonState extends State<TermosButton> {
               ),
               SizedBox(width: metrics.buttonIconSpacing),
             ] else if (displayIcon != null) ...[
-              HugeIcon(icon: displayIcon, color: contentColor, size: metrics.buttonIconSize),
+              TermosIconSlot(
+                icon: displayIcon,
+                tintColor: contentColor,
+                slotSize: metrics.buttonIconSize,
+              ),
               SizedBox(width: metrics.buttonIconSpacing),
             ],
             if (overrideLabel != null)

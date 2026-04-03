@@ -79,6 +79,12 @@ Full constructor parameters for the widgets and painters used in `example/lib/ma
 | `TermosTapTarget` | Dot-grid tap feedback (replaces Material ripple when heavy effects are on) |
 | `TermosAlignedBuilder` | Provides offset relative to `DotGridGroup` for aligned painters |
 
+### How decorations render
+
+`DotGridPainter` is a `CustomPainter` that lays out dots on a regular rectangular lattice and draws the entire background grid in a single `Canvas.drawRawPoints`. Touch and selection decorations are not separate layers or shaders: for each dot inside the influence radius, per-dot color is computed via smoothstep radial falloff and merged with `Color.lerp`, then only the affected dots are overdrawn individually with `Canvas.drawRect`.
+
+Each pointer gets its own `AnimationController` backed by the widget's `TickerProvider`. While the finger is down the animation value stays constant, producing a filled blob; on release a `CurvedAnimation` (`Curves.easeOut`) drives the value upward over `decayDuration`, expanding the blob into a ring that fades out. Each tick calls `setState`, which rebuilds the `CustomPaint` with updated touch data so only one painter handles both static and animated states.
+
 ### Heavy effects toggle
 
 Set `TermosThemeData.heavyEffectsEnabled = false` to disable dot-grid mesh, starfield particles, and CRT overlays. Widgets fall back to simpler Material-style visuals with the same layout and colors.
@@ -157,7 +163,7 @@ Factories: `TermosThemeData.dark()`, `TermosThemeData.light()`, `TermosThemeData
 | `key` | `Key?` | | |
 | `label` | `Text` | ✓ | Button label. |
 | `onTap` | `VoidCallback?` | | |
-| `icon` | `List<List<dynamic>>?` | | HugeIcons-compatible icon data. |
+| `icon` | `Widget?` | | Optional leading icon; tinted for state ([BlendMode.srcIn]). Use a monochrome glyph (e.g. white) for correct disabled/saved coloring. |
 | `enabled` | `bool` | `true` | |
 | `isLoading` | `bool` | `false` | |
 | `loadingLabel` | `String?` | | |
@@ -165,7 +171,7 @@ Factories: `TermosThemeData.dark()`, `TermosThemeData.light()`, `TermosThemeData
 | `savedState` | `bool` | `false` | |
 | `allowTapWhenSaved` | `bool` | `false` | |
 | `savedLabel` | `String?` | | |
-| `savedIcon` | `List<List<dynamic>>?` | | |
+| `savedIcon` | `Widget?` | | Same tinting rules as `icon`. |
 | `height` | `double?` | | |
 | `width` | `double?` | | |
 | `expandWidth` | `bool` | `true` | Fill horizontal space when `true`. |
@@ -210,7 +216,7 @@ Factories: `TermosThemeData.dark()`, `TermosThemeData.light()`, `TermosThemeData
 | Parameter | Type | Required | Description |
 |---|---|:---:|---|
 | `label` | `String` | ✓ | |
-| `icon` | `List<List<dynamic>>?` | | Optional HugeIcons-style icon. |
+| `icon` | `Widget?` | | Optional; same tint behavior as `TermosButton` icons. |
 
 #### `TermosSegmentedSelector`
 
@@ -293,7 +299,7 @@ Factories: `TermosThemeData.dark()`, `TermosThemeData.light()`, `TermosThemeData
 
 | Parameter | Type | Required | Description |
 |---|---|:---:|---|
-| `icon` | `List<List<dynamic>>` | ✓ | HugeIcons-compatible. |
+| `icon` | `Widget` | ✓ | Tab glyph; tinted for selected vs muted ([BlendMode.srcIn]). Monochrome on transparent works best. |
 | `label` | `String` | ✓ | |
 | `color` | `Color` | ✓ | Accent for this tab. |
 

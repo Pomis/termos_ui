@@ -346,22 +346,38 @@ class _TermosUiExampleAppState extends State<TermosUiExampleApp> {
                   TermosNavBar(
                     items: [
                       TermosNavBarItem(
-                        icon: HugeIcons.strokeRoundedMenu01,
+                        icon: HugeIcon(
+                          icon: HugeIcons.strokeRoundedMenu01,
+                          color: Colors.white,
+                          size: termos.metrics.navBarIconSize,
+                        ),
                         label: 'Item A',
                         color: colors.primary,
                       ),
                       TermosNavBarItem(
-                        icon: HugeIcons.strokeRoundedLayers01,
+                        icon: HugeIcon(
+                          icon: HugeIcons.strokeRoundedLayers01,
+                          color: Colors.white,
+                          size: termos.metrics.navBarIconSize,
+                        ),
                         label: 'Item B',
                         color: colors.info,
                       ),
                       TermosNavBarItem(
-                        icon: HugeIcons.strokeRoundedGridView,
+                        icon: HugeIcon(
+                          icon: HugeIcons.strokeRoundedGridView,
+                          color: Colors.white,
+                          size: termos.metrics.navBarIconSize,
+                        ),
                         label: 'Item C',
                         color: colors.warning,
                       ),
                       TermosNavBarItem(
-                        icon: HugeIcons.strokeRoundedMoreHorizontal,
+                        icon: HugeIcon(
+                          icon: HugeIcons.strokeRoundedMoreHorizontal,
+                          color: Colors.white,
+                          size: termos.metrics.navBarIconSize,
+                        ),
                         label: 'Item D',
                         color: colors.error,
                       ),

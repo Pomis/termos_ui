@@ -8,9 +8,14 @@ class GalleryButtonDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final metrics = TermosTheme.of(context).metrics;
     return TermosButton(
       label: const Text('Action'),
-      icon: HugeIcons.strokeRoundedTick01,
+      icon: HugeIcon(
+        icon: HugeIcons.strokeRoundedTick01,
+        color: Colors.white,
+        size: metrics.buttonIconSize,
+      ),
       onTap: () {},
     );
   }
@@ -283,26 +288,43 @@ class _GalleryNavBarDemoState extends State<GalleryNavBarDemo> {
   Widget build(BuildContext context) {
     final termos = TermosTheme.of(context);
     final termosColors = termos.colors;
+    final navIconSize = termos.metrics.navBarIconSize;
 
     return TermosNavBar(
       items: [
         TermosNavBarItem(
-          icon: HugeIcons.strokeRoundedMenu01,
+          icon: HugeIcon(
+            icon: HugeIcons.strokeRoundedMenu01,
+            color: Colors.white,
+            size: navIconSize,
+          ),
           label: 'Item A',
           color: termosColors.primary,
         ),
         TermosNavBarItem(
-          icon: HugeIcons.strokeRoundedLayers01,
+          icon: HugeIcon(
+            icon: HugeIcons.strokeRoundedLayers01,
+            color: Colors.white,
+            size: navIconSize,
+          ),
           label: 'Item B',
           color: termosColors.info,
         ),
         TermosNavBarItem(
-          icon: HugeIcons.strokeRoundedGridView,
+          icon: HugeIcon(
+            icon: HugeIcons.strokeRoundedGridView,
+            color: Colors.white,
+            size: navIconSize,
+          ),
           label: 'Item C',
           color: termosColors.warning,
         ),
         TermosNavBarItem(
-          icon: HugeIcons.strokeRoundedMoreHorizontal,
+          icon: HugeIcon(
+            icon: HugeIcons.strokeRoundedMoreHorizontal,
+            color: Colors.white,
+            size: navIconSize,
+          ),
           label: 'Item D',
           color: termosColors.error,
         ),
