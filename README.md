@@ -1,5 +1,7 @@
 # termos_ui
 
+[![pub package](https://img.shields.io/pub/v/termos_ui.svg)](https://pub.dev/packages/termos_ui)
+
 Flutter UI component library with dot-grid mesh, starfield particles, and CRT-style effects. Provides themed, accessible widgets with a terminal-inspired visual identity.
 
 ! Not ready for production use
