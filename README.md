@@ -106,31 +106,7 @@ flutter run
 
 The example app demonstrates the widgets and painters below. Parameters are the public constructor fields (optional parameters show their defaults where the API defines them).
 
-#### Animated screenshots (GIFs)
-
-Standard Markdown image syntax works on GitHub and many viewers:
-
-```markdown
-![Termos button demo](example/doc/gallery/button.gif)
-```
-
-**Automated rebuild** (from repo root, after changing gallery widgets under `example/lib/gallery/`):
-
-1. Install [ffmpeg](https://ffmpeg.org/) (e.g. `brew install ffmpeg`).
-2. Run:
-
-```bash
-cd packages/termos_ui/example
-bash tool/build_gallery_gifs.sh
-```
-
-This refreshes golden PNGs under `example/test/goldens/export/` (gitignored), writes GIFs to `example/doc/gallery/*.gif`, and runs `flutter test` with `--update-goldens`. Captures use a fixed **400 dp** width at **2×** DPR, and the export test now auto-crops height to the rendered child with small vertical padding so GIF height stays in sync with the widget. `group` and `scanlines` are intentionally excluded from README GIF export. **Roboto** is bundled under `example/fonts/` and loaded via `test/flutter_test_config.dart` (`FontLoader`) so goldens are not stuck on the Ahem placeholder font (green boxes per glyph). ffmpeg defaults to **400px**-wide GIFs (`GALLERY_GIF_WIDTH` to resize). The comet loader records **45** frames. Commit updated GIFs when you want the README visuals to match the code.
-
-**CI:** pushing changes under `packages/termos_ui/` runs example tests (including gallery smoke). Use the **termos_ui** workflow’s *workflow_dispatch* on GitHub Actions to build GIFs on a macOS runner and download the `termos-ui-gallery-gifs` artifact (then commit the GIFs locally).
-
-Capture uses bundled Material fonts (not Google Fonts) so `flutter test` stays offline-friendly; on-screen gallery still uses the full theme when you `flutter run` the example.
-
-Keep GIFs reasonably small so clones stay fast.
+GIF previews below illustrate the widgets and painters that have gallery captures.
 
 #### GlobalKey usage (alignment internals)
 
@@ -174,6 +150,8 @@ Factories: `TermosThemeData.dark()`, `TermosThemeData.light()`, `TermosThemeData
 
 #### `TermosButton`
 
+![Termos button demo](example/doc/gallery/button.gif)
+
 | Parameter | Type | Default | Description |
 |---|---|---|---|
 | `key` | `Key?` | | |
@@ -196,6 +174,8 @@ Factories: `TermosThemeData.dark()`, `TermosThemeData.light()`, `TermosThemeData
 
 #### `TermosBackButton`
 
+![Termos back button demo](example/doc/gallery/back_button.gif)
+
 | Parameter | Type | Default | Description |
 |---|---|---|---|
 | `key` | `Key?` | | |
@@ -204,6 +184,8 @@ Factories: `TermosThemeData.dark()`, `TermosThemeData.light()`, `TermosThemeData
 | `label` | `String?` | | Defaults to `TermosMetrics.backButtonGlyph`. |
 
 #### `TermosLoadingIndicator`
+
+![Termos loading indicator demo](example/doc/gallery/loading_indicator.gif)
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
@@ -232,6 +214,8 @@ Factories: `TermosThemeData.dark()`, `TermosThemeData.light()`, `TermosThemeData
 
 #### `TermosSegmentedSelector`
 
+![Termos segmented selector demo](example/doc/gallery/segmented.gif)
+
 | Parameter | Type | Required | Description |
 |---|---|:---:|---|
 | `key` | `Key?` | | |
@@ -240,6 +224,8 @@ Factories: `TermosThemeData.dark()`, `TermosThemeData.light()`, `TermosThemeData
 | `onSelectionChanged` | `ValueChanged<int>` | ✓ | |
 
 #### `TermosSwitch`
+
+![Termos switch demo](example/doc/gallery/switch.gif)
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
@@ -265,6 +251,8 @@ Factories: `TermosThemeData.dark()`, `TermosThemeData.light()`, `TermosThemeData
 
 #### `TermosTimePicker`
 
+![Termos time picker demo](example/doc/gallery/time_picker.gif)
+
 | Parameter | Type | Default | Description |
 |---|---|---|---|
 | `key` | `Key?` | | |
@@ -274,6 +262,8 @@ Factories: `TermosThemeData.dark()`, `TermosThemeData.light()`, `TermosThemeData
 | `minuteStep` | `int` | `15` | Must divide 60 evenly. |
 
 #### `TermosTextField`
+
+![Termos text field demo](example/doc/gallery/text_field.gif)
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
@@ -309,6 +299,8 @@ Factories: `TermosThemeData.dark()`, `TermosThemeData.light()`, `TermosThemeData
 
 #### `TermosNavBar`
 
+![Termos nav bar demo](example/doc/gallery/nav_bar.gif)
+
 | Parameter | Type | Required | Description |
 |---|---|:---:|---|
 | `key` | `Key?` | | |
@@ -319,6 +311,8 @@ Factories: `TermosThemeData.dark()`, `TermosThemeData.light()`, `TermosThemeData
 
 #### `TermosCrt`
 
+![Termos CRT demo](example/doc/gallery/crt.gif)
+
 | Parameter | Type | Default | Description |
 |---|---|---|---|
 | `key` | `Key?` | | |
@@ -326,6 +320,8 @@ Factories: `TermosThemeData.dark()`, `TermosThemeData.light()`, `TermosThemeData
 | `showOuterEffects` | `bool` | `true` | Outer border and shadow. |
 
 #### `TermosSlider`
+
+![Termos slider demos](example/doc/gallery/sliders.gif)
 
 | Parameter | Type | Required | Description |
 |---|---|:---:|---|
@@ -413,6 +409,8 @@ See **GlobalKey usage** above.
 
 #### `GlowTopBorderPainter` (`CustomPainter`)
 
+![Glow top border painter demo](example/doc/gallery/glow_top_border.gif)
+
 | Parameter | Type | Default | Description |
 |---|---|---|---|
 | `position` | `double` | ✓ | Glow center along top edge, 0–1. |
@@ -423,6 +421,8 @@ See **GlobalKey usage** above.
 | `opacity` | `double` | `1.0` | |
 
 #### `ReactiveStarfieldPainter` (`CustomPainter`)
+
+![Reactive starfield painter demo](example/doc/gallery/reactive_starfield.gif)
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
