@@ -17,15 +17,14 @@ class TermosAlignedBuilder extends StatefulWidget {
 }
 
 class _TermosAlignedBuilderState extends State<TermosAlignedBuilder> {
-  final GlobalKey _key = GlobalKey();
   Offset _gridOffset = Offset.zero;
   bool _computed = false;
 
   void _scheduleUpdate() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      final groupKey = DotGridGroup.maybeOf(context);
-      if (groupKey == null) {
+      final groupContext = DotGridGroup.maybeOf(context);
+      if (groupContext == null) {
         if (_gridOffset != Offset.zero || !_computed) {
           setState(() {
             _gridOffset = Offset.zero;
@@ -34,8 +33,8 @@ class _TermosAlignedBuilderState extends State<TermosAlignedBuilder> {
         }
         return;
       }
-      final myBox = _key.currentContext?.findRenderObject() as RenderBox?;
-      final groupBox = groupKey.currentContext?.findRenderObject() as RenderBox?;
+      final myBox = context.findRenderObject() as RenderBox?;
+      final groupBox = groupContext.findRenderObject() as RenderBox?;
       if (myBox == null || !myBox.hasSize || groupBox == null || !groupBox.hasSize) {
         _scheduleUpdate();
         return;
@@ -68,9 +67,6 @@ class _TermosAlignedBuilderState extends State<TermosAlignedBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    return KeyedSubtree(
-      key: _key,
-      child: widget.builder(_gridOffset),
-    );
+    return widget.builder(_gridOffset);
   }
 }

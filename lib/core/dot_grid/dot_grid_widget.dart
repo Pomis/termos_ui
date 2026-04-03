@@ -71,9 +71,6 @@ class _DotGridWidgetState extends State<DotGridWidget> with TickerProviderStateM
   Offset? _selectionPosition;
   Color? _selectionColor;
   List<SelectionPoint> _externalSelectionPoints = [];
-  final GlobalKey _childKey = GlobalKey();
-  final GlobalKey _paintKey = GlobalKey();
-
   Offset _gridOffset = Offset.zero;
   bool _gridOffsetComputed = false;
 
@@ -113,8 +110,8 @@ class _DotGridWidgetState extends State<DotGridWidget> with TickerProviderStateM
   void _scheduleGridOffsetUpdate() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      final groupKey = DotGridGroup.maybeOf(context);
-      if (groupKey == null) {
+      final groupContext = DotGridGroup.maybeOf(context);
+      if (groupContext == null) {
         if (_gridOffset != Offset.zero || !_gridOffsetComputed) {
           setState(() {
             _gridOffset = Offset.zero;
@@ -123,9 +120,8 @@ class _DotGridWidgetState extends State<DotGridWidget> with TickerProviderStateM
         }
         return;
       }
-      final paintBox = _paintKey.currentContext?.findRenderObject() as RenderBox?;
-      final groupBox = groupKey.currentContext?.findRenderObject() as RenderBox?;
-      final myBox = paintBox ?? _childKey.currentContext?.findRenderObject() as RenderBox?;
+      final myBox = context.findRenderObject() as RenderBox?;
+      final groupBox = groupContext.findRenderObject() as RenderBox?;
       if (myBox == null || !myBox.hasSize || groupBox == null || !groupBox.hasSize) {
         _scheduleGridOffsetUpdate();
         return;
@@ -309,16 +305,10 @@ class _DotGridWidgetState extends State<DotGridWidget> with TickerProviderStateM
   }
 
   Offset _globalToCanvas(Offset globalPosition) {
-    final paintBox = _paintKey.currentContext?.findRenderObject() as RenderBox?;
-    if (paintBox != null) {
+    final box = context.findRenderObject() as RenderBox?;
+    if (box != null) {
       try {
-        return paintBox.globalToLocal(globalPosition);
-      } catch (_) {}
-    }
-    final childBox = _childKey.currentContext?.findRenderObject() as RenderBox?;
-    if (childBox != null) {
-      try {
-        return childBox.globalToLocal(globalPosition);
+        return box.globalToLocal(globalPosition);
       } catch (_) {}
     }
     return globalPosition;
@@ -380,7 +370,6 @@ class _DotGridWidgetState extends State<DotGridWidget> with TickerProviderStateM
             child: IgnorePointer(
               child: RepaintBoundary(
                 child: CustomPaint(
-                  key: _paintKey,
                   painter: DotGridPainter(
                     dotSize: widget.dotSize,
                     gridSpacing: widget.gridSpacing,
@@ -405,7 +394,6 @@ class _DotGridWidgetState extends State<DotGridWidget> with TickerProviderStateM
     );
 
     final listener = Listener(
-      key: _childKey,
       onPointerDown: _handlePointerDown,
       onPointerMove: _handlePointerMove,
       onPointerUp: _handlePointerUp,

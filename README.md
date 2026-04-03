@@ -1,6 +1,8 @@
 # termos_ui
 
-Maximalist Flutter UI component library with dot-grid mesh, starfield particles, and CRT-style effects. Provides themed, accessible widgets with a terminal-inspired visual identity.
+Flutter UI component library with dot-grid mesh, starfield particles, and CRT-style effects. Provides themed, accessible widgets with a terminal-inspired visual identity.
+
+! Not ready for production use
 
 ## Quick start
 
@@ -114,15 +116,15 @@ The example app demonstrates the widgets and painters below. Parameters are the 
 
 GIF previews below illustrate the widgets and painters that have gallery captures.
 
-#### GlobalKey usage (alignment internals)
+#### Grid alignment internals
 
-These types **manage their own `GlobalKey` instances internally** (you do not pass keys for this). They rely on keys for layout measurement and for computing positions inside a `DotGridGroup`. Avoid swapping them with widgets that assume a fixed number of `Element` children, and expect extra `KeyedSubtree` layers if you inspect the tree:
+`DotGridGroup` provides a shared grid origin so that multiple `DotGridWidget` and `TermosAlignedBuilder` instances line up their dot phase. Alignment is computed via `context.findRenderObject()` in post-frame callbacks — no `GlobalKey` instances are used.
 
 | Type | Notes |
 |---|---|
-| `DotGridGroup` | Creates a key on a `KeyedSubtree` around `child`; exposed to descendants via `DotGridGroup.maybeOf` for grid origin. |
-| `DotGridWidget` | Uses internal keys for the child and paint layers. |
-| `TermosAlignedBuilder` | Uses an internal key to compute `localToGlobal` offset vs the nearest `DotGridGroup`. |
+| `DotGridGroup` | Passes its `BuildContext` to descendants via `InheritedWidget`; descendants use it to obtain the group's `RenderBox` for origin alignment. |
+| `DotGridWidget` | Uses `context.findRenderObject()` for pointer coordinate mapping and grid offset computation. |
+| `TermosAlignedBuilder` | Uses `context.findRenderObject()` to compute `localToGlobal` offset vs the nearest `DotGridGroup`. |
 
 `TermosGroup` is a thin wrapper around `DotGridGroup` (same behavior). Several themed widgets compose `DotGridWidget` and/or `TermosAlignedBuilder` (for example `TermosTextField`, `TermosButton`, `TermosBackButton`); the same considerations apply when debugging layout.
 

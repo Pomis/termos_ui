@@ -2,19 +2,21 @@ import 'package:flutter/material.dart';
 
 class _InheritedDotGridGroup extends InheritedWidget {
   const _InheritedDotGridGroup({
-    required this.groupKey,
+    required this.groupContext,
     required super.child,
   });
 
-  final GlobalKey groupKey;
+  final BuildContext groupContext;
 
-  static GlobalKey? maybeOf(BuildContext context) {
-    return context.getInheritedWidgetOfExactType<_InheritedDotGridGroup>()?.groupKey;
+  static BuildContext? maybeOf(BuildContext context) {
+    return context
+        .getInheritedWidgetOfExactType<_InheritedDotGridGroup>()
+        ?.groupContext;
   }
 
   @override
   bool updateShouldNotify(_InheritedDotGridGroup oldWidget) =>
-      groupKey != oldWidget.groupKey;
+      groupContext != oldWidget.groupContext;
 }
 
 /// Establishes a shared grid origin so [DotGridWidget] and aligned overlays line up.
@@ -23,23 +25,19 @@ class DotGridGroup extends StatefulWidget {
 
   final Widget child;
 
-  static GlobalKey? maybeOf(BuildContext context) => _InheritedDotGridGroup.maybeOf(context);
+  static BuildContext? maybeOf(BuildContext context) =>
+      _InheritedDotGridGroup.maybeOf(context);
 
   @override
   State<DotGridGroup> createState() => _DotGridGroupState();
 }
 
 class _DotGridGroupState extends State<DotGridGroup> {
-  final GlobalKey _groupKey = GlobalKey();
-
   @override
   Widget build(BuildContext context) {
     return _InheritedDotGridGroup(
-      groupKey: _groupKey,
-      child: KeyedSubtree(
-        key: _groupKey,
-        child: widget.child,
-      ),
+      groupContext: context,
+      child: widget.child,
     );
   }
 }
