@@ -1,7 +1,26 @@
 name: termos_ui
-description: Maximalist Flutter UI widgets with dot grid, particles, and CRT-style effects.
+description: Maximalist Flutter UI widgets with dot-grid mesh, starfield particles, CRT scanlines, and themed controls.
 version: 0.1.0
-publish_to: none
+repository: https://github.com/Pomis/terminaster/tree/main/packages/termos_ui
+issue_tracker: https://github.com/Pomis/terminaster/issues
+
+topics:
+  - ui
+  - widgets
+  - theme
+  - animations
+
+screenshots:
+  - description: Button with dot-grid mesh and starfield particles.
+    path: example/doc/gallery/button.gif
+  - description: CRT wrapper with scanlines, vignette, and bezel.
+    path: example/doc/gallery/crt.gif
+  - description: Bottom navigation bar with animated top-edge glow.
+    path: example/doc/gallery/nav_bar.gif
+  - description: Segmented selector with glow and starfield.
+    path: example/doc/gallery/segmented.gif
+  - description: Slider variants with floating labels and snap.
+    path: example/doc/gallery/sliders.gif
 
 environment:
   sdk: '>=3.8.0 <4.0.0'
@@ -10,7 +29,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_lints: ^5.0.0

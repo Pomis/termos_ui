@@ -1,4 +1,5 @@
 export 'core/termos_aligned_builder.dart';
+export 'core/termos_icon_slot.dart';
 export 'core/termos_tap_target.dart';
 export 'core/dot_grid/dot_grid_controller.dart';
 export 'core/dot_grid/dot_grid_group.dart';
