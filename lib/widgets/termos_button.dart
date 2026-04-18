@@ -21,8 +21,8 @@ Color _borderColorForState(
   final t = states.contains(WidgetState.pressed)
       ? buttonEffects.borderPressedMix
       : states.contains(WidgetState.hovered)
-          ? buttonEffects.borderHoveredMix
-          : buttonEffects.borderHoverMix;
+      ? buttonEffects.borderHoveredMix
+      : buttonEffects.borderHoverMix;
   return Color.lerp(borderColor, accentColor, t) ?? accentColor;
 }
 
@@ -61,6 +61,7 @@ class TermosButton extends StatefulWidget {
   final Widget? savedIcon;
   final double? height;
   final double? width;
+
   /// When true (default), the button fills available horizontal space. When false,
   /// width follows label + icon (unless [width] is set).
   final bool expandWidth;
@@ -103,7 +104,10 @@ class _TermosButtonState extends State<TermosButton> {
   void _startTypingAnimation() {
     _cancelTypingTimer();
     final label = widget.label.data ?? '';
-    var loadingBase = (widget.loadingLabel ?? '').replaceAll(RegExp(r'\.+$'), '');
+    var loadingBase = (widget.loadingLabel ?? '').replaceAll(
+      RegExp(r'\.+$'),
+      '',
+    );
     int phase = 0;
     int idx = 0;
     final rnd = Random();
@@ -114,8 +118,8 @@ class _TermosButtonState extends State<TermosButton> {
           milliseconds: phase == 0
               ? _backspaceDelayMs
               : phase == 1
-                  ? _typeDelayMs
-                  : _ellipsisDelayMs,
+              ? _typeDelayMs
+              : _ellipsisDelayMs,
         ),
         () {
           if (!mounted) return;
@@ -136,12 +140,15 @@ class _TermosButtonState extends State<TermosButton> {
                 _ellipsisFrame = 0;
                 _typingDisplayText = loadingBase;
               } else {
-                _typingDisplayText =
-                    loadingBase.substring(0, min(idx + 1, loadingBase.length));
+                _typingDisplayText = loadingBase.substring(
+                  0,
+                  min(idx + 1, loadingBase.length),
+                );
               }
             } else {
               _ellipsisFrame = (_ellipsisFrame + 1) % 4;
-              _typingDisplayText = loadingBase + (['', '.', '..', '...'][_ellipsisFrame]);
+              _typingDisplayText =
+                  loadingBase + (['', '.', '..', '...'][_ellipsisFrame]);
             }
           });
           if (mounted && widget.isLoading) scheduleNext();
@@ -182,7 +189,10 @@ class _TermosButtonState extends State<TermosButton> {
                 idx = 0;
                 _typingDisplayText = toText.isEmpty ? '' : toText[0];
               } else {
-                _typingDisplayText = fromText.substring(0, fromText.length - idx);
+                _typingDisplayText = fromText.substring(
+                  0,
+                  fromText.length - idx,
+                );
               }
             } else {
               idx += 1 + rnd.nextInt(3);
@@ -192,7 +202,10 @@ class _TermosButtonState extends State<TermosButton> {
                 _cancelTypingTimer();
                 return;
               } else {
-                _typingDisplayText = toText.substring(0, min(idx + 1, toText.length));
+                _typingDisplayText = toText.substring(
+                  0,
+                  min(idx + 1, toText.length),
+                );
               }
             }
           });
@@ -245,26 +258,29 @@ class _TermosButtonState extends State<TermosButton> {
 
     final isSaved = widget.savedState;
     final isTransitioning = _isTransitioningToSaved;
-    final accentColor =
-        (isSaved || isTransitioning) ? colors.success : (widget.color ?? colors.primary);
+    final accentColor = (isSaved || isTransitioning)
+        ? colors.success
+        : (widget.color ?? colors.primary);
     final effectiveEnabled =
         widget.enabled && !widget.isLoading && !isSaved && !isTransitioning;
-    final tapEnabled = effectiveEnabled || (widget.allowTapWhenSaved && isSaved);
+    final tapEnabled =
+        effectiveEnabled || (widget.allowTapWhenSaved && isSaved);
     final isDisabled =
         !effectiveEnabled && !widget.isLoading && !isSaved && !isTransitioning;
     final useTyping = widget.typingLoadingTransition && widget.isLoading;
     final String? overrideLabel = useTyping && _typingDisplayText != null
         ? _typingDisplayText!
         : isTransitioning && _typingDisplayText != null
-            ? _typingDisplayText!
-            : widget.isLoading
-                ? (widget.loadingLabel ?? '')
-                : isSaved
-                    ? (widget.savedLabel ?? '')
-                    : null;
+        ? _typingDisplayText!
+        : widget.isLoading
+        ? (widget.loadingLabel ?? '')
+        : isSaved
+        ? (widget.savedLabel ?? '')
+        : null;
     final showSpinner = widget.isLoading && !useTyping;
-    final displayIcon =
-        (isSaved || isTransitioning) && widget.savedIcon != null ? widget.savedIcon! : widget.icon;
+    final displayIcon = (isSaved || isTransitioning) && widget.savedIcon != null
+        ? widget.savedIcon!
+        : widget.icon;
     final buttonEffects = termos.button;
     final starfield = termos.starfield;
     final metrics = termos.metrics;
@@ -283,7 +299,11 @@ class _TermosButtonState extends State<TermosButton> {
       duration: disabledTransitionDuration,
       curve: disabledTransitionCurve,
       builder: (context, t, _) {
-        final borderColor = Color.lerp(enabledBorderColor, colors.textMuted, t)!;
+        final borderColor = Color.lerp(
+          enabledBorderColor,
+          colors.textMuted,
+          t,
+        )!;
         final contentColor = Color.lerp(
           accentColor,
           colors.textMuted.withValues(alpha: buttonEffects.contentMutedAlpha),
@@ -291,7 +311,8 @@ class _TermosButtonState extends State<TermosButton> {
         )!;
         final glowColor = Color.lerp(accentColor, colors.textMuted, t)!;
         final isLight = Theme.of(context).brightness == Brightness.light;
-        final glowIntensity = t * starfield.intensityButtonDisabledBlend +
+        final glowIntensity =
+            t * starfield.intensityButtonDisabledBlend +
             (1 - t) *
                 (isLight
                     ? starfield.intensityButtonLight
@@ -319,16 +340,15 @@ class _TermosButtonState extends State<TermosButton> {
               ),
               SizedBox(width: metrics.buttonIconSpacing),
             ],
-            if (overrideLabel != null)
-              Text(overrideLabel)
-            else
-              widget.label,
+            if (overrideLabel != null) Text(overrideLabel) else widget.label,
           ],
         );
         final labelWithSidePadding = widget.expandWidth
             ? labelRow
             : Padding(
-                padding: EdgeInsets.symmetric(horizontal: metrics.buttonHorizontalPadding),
+                padding: EdgeInsets.symmetric(
+                  horizontal: metrics.buttonHorizontalPadding,
+                ),
                 child: labelRow,
               );
         final content = DefaultTextStyle.merge(
@@ -343,8 +363,8 @@ class _TermosButtonState extends State<TermosButton> {
                 ),
         );
 
-        final borderRadius = widget.borderRadius ??
-            BorderRadius.circular(metrics.borderRadius);
+        final borderRadius =
+            widget.borderRadius ?? BorderRadius.circular(metrics.borderRadius);
         final cardBlend = Color.lerp(
           colors.background,
           colors.card,
@@ -355,11 +375,14 @@ class _TermosButtonState extends State<TermosButton> {
         if (useHeavyVisualEffects) {
           final shrinkTap = !widget.expandWidth && widget.width == null;
           final tapTarget = TermosTapTarget(
-            controller: widget.typingLoadingTransition && !isSaved && !isTransitioning
+            controller:
+                widget.typingLoadingTransition && !isSaved && !isTransitioning
                 ? _dotGridController
                 : null,
             onTap: tapEnabled ? widget.onTap : null,
-            enabled: tapEnabled || (widget.typingLoadingTransition && widget.isLoading),
+            enabled:
+                tapEnabled ||
+                (widget.typingLoadingTransition && widget.isLoading),
             borderRadius: borderRadius,
             primaryColor: accentColor,
             blobRadius: dg.blobRadius,
@@ -397,10 +420,7 @@ class _TermosButtonState extends State<TermosButton> {
             child: widget.expandWidth
                 ? Stack(
                     fit: StackFit.expand,
-                    children: [
-                      starfieldLayer,
-                      tapTarget,
-                    ],
+                    children: [starfieldLayer, tapTarget],
                   )
                 : Stack(
                     fit: StackFit.loose,
@@ -436,8 +456,8 @@ class _TermosButtonState extends State<TermosButton> {
     );
 
     final effectiveHeight = widget.height ?? metrics.buttonHeight;
-    final effectiveWidth = widget.width ??
-        (widget.expandWidth ? double.infinity : null);
+    final effectiveWidth =
+        widget.width ?? (widget.expandWidth ? double.infinity : null);
     final semanticLabel = overrideLabel ?? widget.label.data ?? '';
     return Semantics(
       button: true,
@@ -447,7 +467,9 @@ class _TermosButtonState extends State<TermosButton> {
         height: effectiveHeight,
         width: effectiveWidth,
         child: Listener(
-          onPointerDown: tapEnabled ? (_) => setState(() => _pressed = true) : null,
+          onPointerDown: tapEnabled
+              ? (_) => setState(() => _pressed = true)
+              : null,
           onPointerUp: (_) => setState(() => _pressed = false),
           onPointerCancel: (_) => setState(() => _pressed = false),
           child: MouseRegion(

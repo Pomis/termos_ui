@@ -15,6 +15,7 @@ abstract final class GalleryCaptureIds {
   static const navBar = 'nav_bar';
   static const crt = 'crt';
   static const sliders = 'sliders';
+  static const expandableSection = 'expandable_section';
   static const glowTopBorder = 'glow_top_border';
   static const reactiveStarfield = 'reactive_starfield';
   static const scanlines = 'scanlines';
@@ -38,6 +39,8 @@ final Map<String, WidgetBuilder> galleryCaptureDemoBuilders = {
   GalleryCaptureIds.navBar: (_) => const GalleryNavBarDemo(),
   GalleryCaptureIds.crt: (_) => const GalleryCrtDemo(),
   GalleryCaptureIds.sliders: (_) => const GallerySliderShowcase(),
+  GalleryCaptureIds.expandableSection: (_) =>
+      const GalleryExpandableSectionDemo(),
   GalleryCaptureIds.glowTopBorder: (_) => const GalleryGlowTopBorderDemo(),
   GalleryCaptureIds.reactiveStarfield: (_) => const GalleryReactiveStarfieldDemo(),
   GalleryCaptureIds.scanlines: (_) => const GalleryScanlinesDemo(),

@@ -108,6 +108,13 @@ class _TermosSegmentedSelectorState extends State<TermosSegmentedSelector>
       colors.card,
       isLight ? buttonEffects.cardBlendLight : buttonEffects.cardBlendDark,
     )!;
+    final unselectedSegmentColor = isLight
+        ? Color.lerp(
+            colors.textMuted,
+            Colors.white,
+            segmented.unselectedLabelMixWithWhiteLight,
+          )!
+        : colors.textMuted;
 
     return TermosGroup(
       child: AnimatedBuilder(
@@ -136,7 +143,7 @@ class _TermosSegmentedSelectorState extends State<TermosSegmentedSelector>
                       child: Center(
                         child: DefaultTextStyle.merge(
                           style: textStyles.terminalHeader(
-                            i == sel ? colors.primary : colors.textMuted,
+                            i == sel ? colors.primary : unselectedSegmentColor,
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -144,7 +151,7 @@ class _TermosSegmentedSelectorState extends State<TermosSegmentedSelector>
                               if (widget.items[i].icon != null) ...[
                                 TermosIconSlot(
                                   icon: widget.items[i].icon!,
-                                  tintColor: i == sel ? colors.primary : colors.textMuted,
+                                  tintColor: i == sel ? colors.primary : unselectedSegmentColor,
                                   slotSize: metrics.buttonIconSize,
                                 ),
                                 SizedBox(width: metrics.buttonIconSpacing),

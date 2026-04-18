@@ -7,15 +7,27 @@ import '../theme/termos_theme.dart';
 
 /// Terminal-style back control for app bars (dot grid mesh + starfield when heavy effects on).
 class TermosBackButton extends StatelessWidget {
-  const TermosBackButton({super.key, required this.onTap, this.size, this.label});
+  const TermosBackButton({
+    super.key,
+    required this.onTap,
+    this.size,
+    this.child,
+    this.padding,
+  });
 
   final VoidCallback onTap;
 
   /// Defaults to [TermosMetrics.backButtonDefaultSize].
   final double? size;
 
-  /// Defaults to [TermosMetrics.backButtonGlyph] when null.
-  final String? label;
+  /// Visual content. When null, uses the platform-adaptive [BackButtonIcon]
+  /// (Material arrow on Android, Cupertino chevron on iOS) with
+  /// [TermosMetrics.backButtonIconSize] and theme primary color.
+  final Widget? child;
+
+  /// Inner padding around the glyph. Defaults to
+  /// [TermosMetrics.backButtonPadding] when null.
+  final EdgeInsetsGeometry? padding;
 
   static const _seed = 0x6261636B; // "back"
 
@@ -25,24 +37,23 @@ class TermosBackButton extends StatelessWidget {
     final useHeavy = termos.heavyEffectsEnabled;
     final colors = termos.colors;
     final dg = termos.dotGrid;
-    final textStyles = termos.textStyles;
     final metrics = termos.metrics;
     final starfield = termos.starfield;
     final isLight = Theme.of(context).brightness == Brightness.light;
 
-    final displayLabel = label ?? metrics.backButtonGlyph;
     final effectiveSize = size ?? metrics.backButtonDefaultSize;
 
+    final Widget glyph = child ??
+        IconTheme(
+          data: IconThemeData(color: colors.primary, size: metrics.backButtonIconSize),
+          child: const BackButtonIcon(),
+        );
+
     final content = Padding(
-      padding: metrics.backButtonPadding,
+      padding: padding ?? metrics.backButtonPadding,
       child: Align(
         alignment: Alignment.center,
-        child: Text(
-          displayLabel,
-          style: textStyles
-              .codePrimary(colors.primary)
-              .copyWith(fontWeight: FontWeight.w600, height: 1),
-        ),
+        child: glyph,
       ),
     );
 
@@ -94,7 +105,7 @@ class TermosBackButton extends StatelessWidget {
 
     return Semantics(
       button: true,
-      label: label ?? 'Back',
+      label: 'Back',
       child: SizedBox(width: effectiveSize, height: effectiveSize, child: decorated),
     );
   }

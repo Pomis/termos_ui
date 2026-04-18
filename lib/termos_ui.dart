@@ -24,6 +24,7 @@ export 'widgets/termos_comet_circular_progress.dart';
 export 'widgets/termos_crt.dart';
 export 'widgets/termos_continuous_slider.dart';
 export 'widgets/termos_detailed_slider.dart';
+export 'widgets/termos_expandable_section.dart';
 export 'widgets/termos_floating_slider.dart';
 export 'widgets/termos_group.dart';
 export 'widgets/termos_loading_indicator.dart';

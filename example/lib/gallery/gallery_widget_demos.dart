@@ -21,7 +21,7 @@ class GalleryButtonDemo extends StatelessWidget {
   }
 }
 
-/// Compact back control.
+/// Compact back control (default platform-adaptive back icon).
 class GalleryBackButtonDemo extends StatelessWidget {
   const GalleryBackButtonDemo({super.key});
 
@@ -487,6 +487,90 @@ class GalleryReactiveStarfieldDemo extends StatelessWidget {
           seed: 42,
         ),
         child: const SizedBox.expand(),
+      ),
+    );
+  }
+}
+
+/// Two stacked [TermosExpandableSection]s with independent local state.
+///
+/// Demonstrates header-only, header + content-between, and the expanded body
+/// animation driven by tapping anywhere on the card.
+class GalleryExpandableSectionDemo extends StatefulWidget {
+  const GalleryExpandableSectionDemo({super.key});
+
+  @override
+  State<GalleryExpandableSectionDemo> createState() =>
+      _GalleryExpandableSectionDemoState();
+}
+
+class _GalleryExpandableSectionDemoState
+    extends State<GalleryExpandableSectionDemo> {
+  bool _firstExpanded = true;
+  bool _secondExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final termos = TermosTheme.of(context);
+    final colors = termos.colors;
+    final textStyles = termos.textStyles;
+
+    Widget header(String title, String subtitle) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(title, style: textStyles.sectionTitle(colors.textPrimary)),
+          const SizedBox(height: 2),
+          Text(subtitle, style: textStyles.body(colors.textMuted)),
+        ],
+      );
+    }
+
+    return TermosGroup(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TermosExpandableSection(
+            isExpanded: _firstExpanded,
+            onToggle: () =>
+                setState(() => _firstExpanded = !_firstExpanded),
+            starfieldSeed: 'expandable-first'.hashCode,
+            header: header(
+              'Hand out',
+              'Tap anywhere on the card to toggle.',
+            ),
+            contentBetween: Text(
+              'Always-visible content sits between the header and the '
+              'expanded body.',
+              style: textStyles.body(colors.textSecondary),
+            ),
+            expandedChild: Text(
+              'Expanded body — animates open with a size transition. '
+              'Use this slot for forms, command details, or extended copy.',
+              style: textStyles.body(colors.textPrimary),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TermosExpandableSection(
+            isExpanded: _secondExpanded,
+            onToggle: () =>
+                setState(() => _secondExpanded = !_secondExpanded),
+            accentColor: colors.info,
+            starfieldSeed: 'expandable-second'.hashCode,
+            header: header(
+              'Headers only',
+              'Independent state, accent color, and starfield seed.',
+            ),
+            expandedChild: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                r'$ termos run --expand',
+                style: textStyles.codePrimary(colors.textSecondary),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

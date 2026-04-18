@@ -335,21 +335,28 @@ class TermosSegmentedEffects {
     this.glowColorMixWithWhite = 0.5,
     this.glowBaseOpacityLight = 0.15,
     this.glowBaseOpacityDark = 0.05,
+    /// Unselected segment label/icon tint in light mode: `lerp(textMuted, white, this)`.
+    /// Dark mode keeps [TermosColors.textMuted] as-is.
+    this.unselectedLabelMixWithWhiteLight = 0.32,
   });
 
   final double glowColorMixWithWhite;
   final double glowBaseOpacityLight;
   final double glowBaseOpacityDark;
+  final double unselectedLabelMixWithWhiteLight;
 
   TermosSegmentedEffects copyWith({
     double? glowColorMixWithWhite,
     double? glowBaseOpacityLight,
     double? glowBaseOpacityDark,
+    double? unselectedLabelMixWithWhiteLight,
   }) {
     return TermosSegmentedEffects(
       glowColorMixWithWhite: glowColorMixWithWhite ?? this.glowColorMixWithWhite,
       glowBaseOpacityLight: glowBaseOpacityLight ?? this.glowBaseOpacityLight,
       glowBaseOpacityDark: glowBaseOpacityDark ?? this.glowBaseOpacityDark,
+      unselectedLabelMixWithWhiteLight:
+          unselectedLabelMixWithWhiteLight ?? this.unselectedLabelMixWithWhiteLight,
     );
   }
 
@@ -359,6 +366,11 @@ class TermosSegmentedEffects {
           lerpDouble(glowColorMixWithWhite, other.glowColorMixWithWhite, t)!,
       glowBaseOpacityLight: lerpDouble(glowBaseOpacityLight, other.glowBaseOpacityLight, t)!,
       glowBaseOpacityDark: lerpDouble(glowBaseOpacityDark, other.glowBaseOpacityDark, t)!,
+      unselectedLabelMixWithWhiteLight: lerpDouble(
+        unselectedLabelMixWithWhiteLight,
+        other.unselectedLabelMixWithWhiteLight,
+        t,
+      )!,
     );
   }
 
@@ -368,11 +380,16 @@ class TermosSegmentedEffects {
       other is TermosSegmentedEffects &&
           glowColorMixWithWhite == other.glowColorMixWithWhite &&
           glowBaseOpacityLight == other.glowBaseOpacityLight &&
-          glowBaseOpacityDark == other.glowBaseOpacityDark;
+          glowBaseOpacityDark == other.glowBaseOpacityDark &&
+          unselectedLabelMixWithWhiteLight == other.unselectedLabelMixWithWhiteLight;
 
   @override
-  int get hashCode =>
-      Object.hash(glowColorMixWithWhite, glowBaseOpacityLight, glowBaseOpacityDark);
+  int get hashCode => Object.hash(
+        glowColorMixWithWhite,
+        glowBaseOpacityLight,
+        glowBaseOpacityDark,
+        unselectedLabelMixWithWhiteLight,
+      );
 }
 
 /// Button card background blend and border (per theme).

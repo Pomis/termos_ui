@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:termos_ui/termos_ui.dart';
 import 'package:termos_ui_example/gallery/gallery_widget_demos.dart';
@@ -40,6 +41,9 @@ class _TermosUiExampleAppState extends State<TermosUiExampleApp> {
   double _navStarfieldIntensity = 1.5;
 
   double _segmentedGlowMix = 0.5;
+  double _segmentedUnselectedLabelMix = 0.32;
+
+  double _backButtonIconSize = 20;
 
   double _crtScanlineOpacity = 0.06;
   double _crtVignette = 0.5;
@@ -53,6 +57,10 @@ class _TermosUiExampleAppState extends State<TermosUiExampleApp> {
   TimeOfDay _time = const TimeOfDay(hour: 14, minute: 30);
 
   int _loaderSeed = 0;
+
+  /// [MaterialApp] is built under this state; [context] is above it, so dialogs
+  /// must use a context from inside the app (e.g. the navigator).
+  final _navigatorKey = GlobalKey<NavigatorState>();
 
   final _proseFieldController = TextEditingController();
 
@@ -99,6 +107,7 @@ class _TermosUiExampleAppState extends State<TermosUiExampleApp> {
         glowTopBorderStrokeWidth: _glowStrokeWidth,
         crtScanlineOpacity: _crtScanlineOpacity,
         crtVignetteStrength: _crtVignette,
+        backButtonIconSize: _backButtonIconSize,
       ),
       starfield: base.starfield.copyWith(
         intensityButtonLight: _starfieldIntensityLight,
@@ -110,6 +119,7 @@ class _TermosUiExampleAppState extends State<TermosUiExampleApp> {
       ),
       segmented: base.segmented.copyWith(
         glowColorMixWithWhite: _segmentedGlowMix,
+        unselectedLabelMixWithWhiteLight: _segmentedUnselectedLabelMix,
       ),
       timePicker: base.timePicker.copyWith(
         scanlineOpacityLight: _tpScanLight,
@@ -126,18 +136,62 @@ class _TermosUiExampleAppState extends State<TermosUiExampleApp> {
     required Color current,
     required ValueChanged<Color> onColor,
   }) async {
+    final navigatorContext = _navigatorKey.currentContext;
+    if (navigatorContext == null || !mounted) return;
+
     final themeSnapshot = _themeData();
+    var dialogColor = current;
+
     await showDialog<void>(
-      context: context,
+      context: navigatorContext,
       useRootNavigator: true,
       barrierDismissible: true,
       builder: (dialogContext) {
+        final colors = themeSnapshot.colors;
+        final textStyles = themeSnapshot.textStyles;
+
         return TermosTheme(
           data: themeSnapshot,
-          child: _TermosColorPickerDialog(
-            title: title,
-            initialColor: current,
-            onApply: onColor,
+          child: StatefulBuilder(
+            builder: (context, setDialogState) {
+              return AlertDialog(
+                backgroundColor: colors.surface,
+                title: SelectableText(
+                  title,
+                  style: textStyles.sectionTitle(colors.textPrimary),
+                ),
+                content: SingleChildScrollView(
+                  child: ColorPicker(
+                    pickerColor: dialogColor,
+                    onColorChanged: (color) => setDialogState(() => dialogColor = color),
+                    enableAlpha: false,
+                    displayThumbColor: true,
+                    pickerAreaHeightPercent: 0.75,
+                    labelTypes: const [ColorLabelType.rgb],
+                    hexInputBar: true,
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    child: Text(
+                      'Cancel',
+                      style: textStyles.codePrimary(colors.primary),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      onColor(dialogColor);
+                      Navigator.of(dialogContext).pop();
+                    },
+                    child: Text(
+                      'Apply',
+                      style: textStyles.codePrimary(colors.primary),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         );
       },
@@ -151,6 +205,7 @@ class _TermosUiExampleAppState extends State<TermosUiExampleApp> {
     final textStyles = termos.textStyles;
 
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'termos_ui Theme configurator',
       theme: ThemeData(
@@ -209,6 +264,8 @@ class _TermosUiExampleAppState extends State<TermosUiExampleApp> {
                   navGlowMix: _navGlowMix,
                   navStarfieldIntensity: _navStarfieldIntensity,
                   segmentedGlowMix: _segmentedGlowMix,
+                  segmentedUnselectedLabelMix: _segmentedUnselectedLabelMix,
+                  backButtonIconSize: _backButtonIconSize,
                   crtScanlineOpacity: _crtScanlineOpacity,
                   crtVignette: _crtVignette,
                   tpScanLight: _tpScanLight,
@@ -231,6 +288,10 @@ class _TermosUiExampleAppState extends State<TermosUiExampleApp> {
                   onNavGlowMix: (v) => _set(() => _navGlowMix = v),
                   onNavStarfieldIntensity: (v) => _set(() => _navStarfieldIntensity = v),
                   onSegmentedGlowMix: (v) => _set(() => _segmentedGlowMix = v),
+                  onSegmentedUnselectedLabelMix: (v) =>
+                      _set(() => _segmentedUnselectedLabelMix = v),
+                  onBackButtonIconSize: (v) =>
+                      _set(() => _backButtonIconSize = v),
                   onCrtScanline: (v) => _set(() => _crtScanlineOpacity = v),
                   onCrtVignette: (v) => _set(() => _crtVignette = v),
                   onTpScanLight: (v) => _set(() => _tpScanLight = v),
@@ -340,6 +401,12 @@ class _TermosUiExampleAppState extends State<TermosUiExampleApp> {
                   ),
                 ),
                 _fullWidthSection(
+                  'TermosExpandableSection',
+                  colors,
+                  textStyles,
+                  const GalleryExpandableSectionDemo(),
+                ),
+                _fullWidthSection(
                   'TermosNavBar',
                   colors,
                   textStyles,
@@ -421,150 +488,6 @@ class _TermosUiExampleAppState extends State<TermosUiExampleApp> {
                     ],
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Pure Flutter RGB editor — works on web (no canvas/gesture issues from third-party pickers).
-class _TermosColorPickerDialog extends StatefulWidget {
-  const _TermosColorPickerDialog({
-    required this.title,
-    required this.initialColor,
-    required this.onApply,
-  });
-
-  final String title;
-  final Color initialColor;
-  final ValueChanged<Color> onApply;
-
-  @override
-  State<_TermosColorPickerDialog> createState() => _TermosColorPickerDialogState();
-}
-
-class _TermosColorPickerDialogState extends State<_TermosColorPickerDialog> {
-  late Color _color;
-
-  @override
-  void initState() {
-    super.initState();
-    _color = widget.initialColor;
-  }
-
-  static int _ch(Color c, double Function(Color) comp) =>
-      (comp(c) * 255.0).round().clamp(0, 255);
-
-  void _setRgb(int r, int g, int b) {
-    setState(() {
-      _color = Color.fromARGB(255, r, g, b);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final termos = TermosTheme.of(context);
-    final colors = termos.colors;
-    final textStyles = termos.textStyles;
-    final metrics = termos.metrics;
-    final r = _ch(_color, (c) => c.r);
-    final g = _ch(_color, (c) => c.g);
-    final b = _ch(_color, (c) => c.b);
-
-    return Dialog(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 360),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SelectableText(widget.title, style: textStyles.sectionTitle(colors.textPrimary)),
-              const SizedBox(height: 16),
-              SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Container(
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: _color,
-                        borderRadius: BorderRadius.circular(metrics.borderRadius),
-                        border: Border.all(color: colors.dotGridButtonBorder, width: 1),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SelectableText('R', style: textStyles.codePrimary(colors.textMuted)),
-                    SizedBox(
-                      height: 44,
-                      child: TermosSlider(
-                        value: r.toDouble(),
-                        start: 0,
-                        end: 255,
-                        step: TermosSlider.evenStep(0, 255),
-                        formatValue: (v) => v.round().clamp(0, 255).toString(),
-                        onChanged: (v) {
-                          final nextR = v.round().clamp(0, 255);
-                          final base = _color;
-                          _setRgb(nextR, _ch(base, (c) => c.g), _ch(base, (c) => c.b));
-                        },
-                      ),
-                    ),
-                    SelectableText('G', style: textStyles.codePrimary(colors.textMuted)),
-                    SizedBox(
-                      height: 44,
-                      child: TermosSlider(
-                        value: g.toDouble(),
-                        start: 0,
-                        end: 255,
-                        step: TermosSlider.evenStep(0, 255),
-                        formatValue: (v) => v.round().clamp(0, 255).toString(),
-                        onChanged: (v) {
-                          final nextG = v.round().clamp(0, 255);
-                          final base = _color;
-                          _setRgb(_ch(base, (c) => c.r), nextG, _ch(base, (c) => c.b));
-                        },
-                      ),
-                    ),
-                    SelectableText('B', style: textStyles.codePrimary(colors.textMuted)),
-                    SizedBox(
-                      height: 44,
-                      child: TermosSlider(
-                        value: b.toDouble(),
-                        start: 0,
-                        end: 255,
-                        step: TermosSlider.evenStep(0, 255),
-                        formatValue: (v) => v.round().clamp(0, 255).toString(),
-                        onChanged: (v) {
-                          final nextB = v.round().clamp(0, 255);
-                          final base = _color;
-                          _setRgb(_ch(base, (c) => c.r), _ch(base, (c) => c.g), nextB);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Cancel'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      widget.onApply(_color);
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Apply'),
-                  ),
-                ],
               ),
             ],
           ),
@@ -793,6 +716,8 @@ class _ControlPanel extends StatelessWidget {
     required this.navGlowMix,
     required this.navStarfieldIntensity,
     required this.segmentedGlowMix,
+    required this.segmentedUnselectedLabelMix,
+    required this.backButtonIconSize,
     required this.crtScanlineOpacity,
     required this.crtVignette,
     required this.tpScanLight,
@@ -812,6 +737,8 @@ class _ControlPanel extends StatelessWidget {
     required this.onNavGlowMix,
     required this.onNavStarfieldIntensity,
     required this.onSegmentedGlowMix,
+    required this.onSegmentedUnselectedLabelMix,
+    required this.onBackButtonIconSize,
     required this.onCrtScanline,
     required this.onCrtVignette,
     required this.onTpScanLight,
@@ -837,6 +764,8 @@ class _ControlPanel extends StatelessWidget {
   final double navGlowMix;
   final double navStarfieldIntensity;
   final double segmentedGlowMix;
+  final double segmentedUnselectedLabelMix;
+  final double backButtonIconSize;
   final double crtScanlineOpacity;
   final double crtVignette;
   final double tpScanLight;
@@ -856,6 +785,8 @@ class _ControlPanel extends StatelessWidget {
   final ValueChanged<double> onNavGlowMix;
   final ValueChanged<double> onNavStarfieldIntensity;
   final ValueChanged<double> onSegmentedGlowMix;
+  final ValueChanged<double> onSegmentedUnselectedLabelMix;
+  final ValueChanged<double> onBackButtonIconSize;
   final ValueChanged<double> onCrtScanline;
   final ValueChanged<double> onCrtVignette;
   final ValueChanged<double> onTpScanLight;
@@ -1078,6 +1009,27 @@ class _ControlPanel extends StatelessWidget {
                 end: 1,
                 step: TermosSlider.evenStep(0, 1),
                 onChanged: onSegmentedGlowMix,
+                colors: colors,
+                textStyles: textStyles,
+              ),
+              _SliderRow(
+                label: 'unselectedLabelMixWithWhiteLight',
+                value: segmentedUnselectedLabelMix,
+                start: 0,
+                end: 1,
+                step: TermosSlider.evenStep(0, 1),
+                onChanged: onSegmentedUnselectedLabelMix,
+                colors: colors,
+                textStyles: textStyles,
+              ),
+              _DetailedSliderRow(
+                label: 'backButtonIconSize',
+                value: backButtonIconSize,
+                min: 12,
+                max: 32,
+                divisions: 5,
+                subdivisions: 4,
+                onChanged: onBackButtonIconSize,
                 colors: colors,
                 textStyles: textStyles,
               ),

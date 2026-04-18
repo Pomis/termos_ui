@@ -19,9 +19,10 @@ class TermosMetrics {
     this.buttonHorizontalPadding = 16,
     // ── Back button ──
     this.backButtonDefaultSize = 54,
-    this.backButtonPadding = const EdgeInsets.fromLTRB(12, 18, 12, 18),
+    this.backButtonPadding = const EdgeInsets.all(8),
     this.backButtonBackgroundBlend = 0.5,
     this.backButtonGlyph = '<-',
+    this.backButtonIconSize = 20,
     // ── Tap target fallback ──
     this.tapTargetDefaultBorderRadius = 8,
     // ── Nav bar ──
@@ -65,8 +66,13 @@ class TermosMetrics {
   /// [Color.lerp](background, card, this) for back button fill.
   final double backButtonBackgroundBlend;
 
-  /// Shown when [TermosBackButton.label] is null.
+  /// Optional default glyph string for custom back content (not used by
+  /// [TermosBackButton] itself; callers may use it when building a [child]).
   final String backButtonGlyph;
+
+  /// Icon size for the default [BackButtonIcon] when [TermosBackButton.child]
+  /// is null.
+  final double backButtonIconSize;
 
   final double tapTargetDefaultBorderRadius;
 
@@ -119,6 +125,7 @@ class TermosMetrics {
     EdgeInsets? backButtonPadding,
     double? backButtonBackgroundBlend,
     String? backButtonGlyph,
+    double? backButtonIconSize,
     double? tapTargetDefaultBorderRadius,
     double? navBarHorizontalPadding,
     double? navBarOuterHorizontalPadding,
@@ -154,6 +161,7 @@ class TermosMetrics {
       backButtonPadding: backButtonPadding ?? this.backButtonPadding,
       backButtonBackgroundBlend: backButtonBackgroundBlend ?? this.backButtonBackgroundBlend,
       backButtonGlyph: backButtonGlyph ?? this.backButtonGlyph,
+      backButtonIconSize: backButtonIconSize ?? this.backButtonIconSize,
       tapTargetDefaultBorderRadius:
           tapTargetDefaultBorderRadius ?? this.tapTargetDefaultBorderRadius,
       navBarHorizontalPadding: navBarHorizontalPadding ?? this.navBarHorizontalPadding,
@@ -213,6 +221,7 @@ class TermosMetrics {
         t,
       )!,
       backButtonGlyph: t < 0.5 ? backButtonGlyph : other.backButtonGlyph,
+      backButtonIconSize: lerpDouble(backButtonIconSize, other.backButtonIconSize, t)!,
       tapTargetDefaultBorderRadius: lerpDouble(
         tapTargetDefaultBorderRadius,
         other.tapTargetDefaultBorderRadius,
@@ -293,6 +302,7 @@ class TermosMetrics {
           backButtonPadding == other.backButtonPadding &&
           backButtonBackgroundBlend == other.backButtonBackgroundBlend &&
           backButtonGlyph == other.backButtonGlyph &&
+          backButtonIconSize == other.backButtonIconSize &&
           tapTargetDefaultBorderRadius == other.tapTargetDefaultBorderRadius &&
           navBarHorizontalPadding == other.navBarHorizontalPadding &&
           navBarOuterHorizontalPadding == other.navBarOuterHorizontalPadding &&
@@ -328,6 +338,7 @@ class TermosMetrics {
     backButtonPadding,
     backButtonBackgroundBlend,
     backButtonGlyph,
+    backButtonIconSize,
     tapTargetDefaultBorderRadius,
     navBarHorizontalPadding,
     navBarOuterHorizontalPadding,

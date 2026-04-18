@@ -41,19 +41,21 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
   final bool heavyEffectsEnabled;
 
   factory TermosThemeData.dark() => TermosThemeData(
-        colors: TermosColors.dark,
-        dotGrid: const DotGridConfig(),
-        textStyles: TermosTextStyles.fromColors(TermosColors.dark),
-      );
+    colors: TermosColors.dark,
+    dotGrid: const DotGridConfig(),
+    textStyles: TermosTextStyles.fromColors(TermosColors.dark),
+  );
 
   factory TermosThemeData.light() => TermosThemeData(
-        colors: TermosColors.light,
-        dotGrid: const DotGridConfig(),
-        textStyles: TermosTextStyles.fromColors(TermosColors.light),
-      );
+    colors: TermosColors.light,
+    dotGrid: const DotGridConfig(),
+    textStyles: TermosTextStyles.fromColors(TermosColors.light),
+  );
 
   factory TermosThemeData.fallbackBrightness(Brightness brightness) =>
-      brightness == Brightness.light ? TermosThemeData.light() : TermosThemeData.dark();
+      brightness == Brightness.light
+      ? TermosThemeData.light()
+      : TermosThemeData.dark();
 
   @override
   TermosThemeData copyWith({
@@ -98,7 +100,9 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
       button: button.lerp(other.button, t),
       crt: crt.lerp(other.crt, t),
       timePicker: timePicker.lerp(other.timePicker, t),
-      heavyEffectsEnabled: t < 0.5 ? heavyEffectsEnabled : other.heavyEffectsEnabled,
+      heavyEffectsEnabled: t < 0.5
+          ? heavyEffectsEnabled
+          : other.heavyEffectsEnabled,
     );
   }
 
@@ -120,27 +124,23 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
 
   @override
   int get hashCode => Object.hash(
-        colors,
-        dotGrid,
-        textStyles,
-        metrics,
-        starfield,
-        navBar,
-        segmented,
-        button,
-        crt,
-        timePicker,
-        heavyEffectsEnabled,
-      );
+    colors,
+    dotGrid,
+    textStyles,
+    metrics,
+    starfield,
+    navBar,
+    segmented,
+    button,
+    crt,
+    timePicker,
+    heavyEffectsEnabled,
+  );
 }
 
 /// Provides [TermosThemeData] to descendant widgets (Flutter-style inherited theme).
 class TermosTheme extends InheritedWidget {
-  const TermosTheme({
-    super.key,
-    required this.data,
-    required super.child,
-  });
+  const TermosTheme({super.key, required this.data, required super.child});
 
   final TermosThemeData data;
 
