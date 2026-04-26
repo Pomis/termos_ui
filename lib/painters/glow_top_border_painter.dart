@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 
 /// Draws the top edge glow with a colour spotlight at [position] (0–1 along the top).
+///
+/// Spotlight extent is configurable via [glowSpread] / [glowCore] (the visible
+/// gradient stroke) and [haloSpread] / [haloCore] (the wider blurred halo
+/// underneath). All four are expressed as fractions of width and represent the
+/// half-width of the falloff (`spread`) and the half-width of the bright core
+/// (`core`).
 class GlowTopBorderPainter extends CustomPainter {
   GlowTopBorderPainter({
     required this.position,
@@ -9,6 +15,13 @@ class GlowTopBorderPainter extends CustomPainter {
     required this.strokeWidth,
     required this.radius,
     this.opacity = 1.0,
+    this.glowSpread = 0.14,
+    this.glowCore = 0.03,
+    this.haloSpread = 0.16,
+    this.haloCore = 0.04,
+    this.haloAlpha = 0.35,
+    this.haloStrokeBoost = 10,
+    this.haloBlurSigma = 6,
   });
 
   final double position;
@@ -17,6 +30,27 @@ class GlowTopBorderPainter extends CustomPainter {
   final double strokeWidth;
   final double radius;
   final double opacity;
+
+  /// Outer falloff of the visible gradient stroke (fraction of width).
+  final double glowSpread;
+
+  /// Bright-core half-width of the visible gradient stroke (fraction of width).
+  final double glowCore;
+
+  /// Outer falloff of the blurred halo pass (fraction of width).
+  final double haloSpread;
+
+  /// Bright-core half-width of the blurred halo pass (fraction of width).
+  final double haloCore;
+
+  /// Peak alpha of the halo pass.
+  final double haloAlpha;
+
+  /// Pixels added to [strokeWidth] when drawing the halo pass.
+  final double haloStrokeBoost;
+
+  /// Blur sigma used by the halo pass mask filter.
+  final double haloBlurSigma;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -34,29 +68,29 @@ class GlowTopBorderPainter extends CustomPainter {
     final gradient = LinearGradient(
       colors: [effBase, effGlow, effGlow, effBase],
       stops: [
-        (position - 0.14).clamp(0.0, 1.0),
-        (position - 0.03).clamp(0.0, 1.0),
-        (position + 0.03).clamp(0.0, 1.0),
-        (position + 0.14).clamp(0.0, 1.0),
+        (position - glowSpread).clamp(0.0, 1.0),
+        (position - glowCore).clamp(0.0, 1.0),
+        (position + glowCore).clamp(0.0, 1.0),
+        (position + glowSpread).clamp(0.0, 1.0),
       ],
     );
 
     final shadowPaint = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth + 10
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6)
+      ..strokeWidth = strokeWidth + haloStrokeBoost
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, haloBlurSigma)
       ..shader = LinearGradient(
         colors: [
           glowColor.withValues(alpha: 0),
-          glowColor.withValues(alpha: 0.35 * opacity),
-          glowColor.withValues(alpha: 0.35 * opacity),
+          glowColor.withValues(alpha: haloAlpha * opacity),
+          glowColor.withValues(alpha: haloAlpha * opacity),
           glowColor.withValues(alpha: 0),
         ],
         stops: [
-          (position - 0.16).clamp(0.0, 1.0),
-          (position - 0.04).clamp(0.0, 1.0),
-          (position + 0.04).clamp(0.0, 1.0),
-          (position + 0.16).clamp(0.0, 1.0),
+          (position - haloSpread).clamp(0.0, 1.0),
+          (position - haloCore).clamp(0.0, 1.0),
+          (position + haloCore).clamp(0.0, 1.0),
+          (position + haloSpread).clamp(0.0, 1.0),
         ],
       ).createShader(shaderRect);
     canvas.drawPath(path, shadowPaint);
@@ -74,5 +108,13 @@ class GlowTopBorderPainter extends CustomPainter {
       glowColor != old.glowColor ||
       baseColor != old.baseColor ||
       opacity != old.opacity ||
-      strokeWidth != old.strokeWidth;
+      strokeWidth != old.strokeWidth ||
+      radius != old.radius ||
+      glowSpread != old.glowSpread ||
+      glowCore != old.glowCore ||
+      haloSpread != old.haloSpread ||
+      haloCore != old.haloCore ||
+      haloAlpha != old.haloAlpha ||
+      haloStrokeBoost != old.haloStrokeBoost ||
+      haloBlurSigma != old.haloBlurSigma;
 }

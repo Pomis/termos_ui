@@ -46,6 +46,7 @@ class TermosButton extends StatefulWidget {
     this.expandWidth = true,
     this.color,
     this.borderRadius,
+    this.multilineLabel = false,
   });
 
   final Text label;
@@ -67,6 +68,13 @@ class TermosButton extends StatefulWidget {
   final bool expandWidth;
   final Color? color;
   final BorderRadius? borderRadius;
+
+  /// When true, the label is allowed to wrap onto multiple lines and the
+  /// button grows vertically to fit the wrapped text. The configured
+  /// [height] (or theme `buttonHeight`) is used as a minimum height instead
+  /// of a fixed height. The label is wrapped in [Flexible] so it can shrink
+  /// to the available width within the button's row.
+  final bool multilineLabel;
 
   @override
   State<TermosButton> createState() => _TermosButtonState();
@@ -340,11 +348,27 @@ class _TermosButtonState extends State<TermosButton> {
               ),
               SizedBox(width: metrics.buttonIconSpacing),
             ],
-            if (overrideLabel != null) Text(overrideLabel) else widget.label,
+            if (widget.multilineLabel)
+              Flexible(
+                child: overrideLabel != null
+                    ? Text(overrideLabel)
+                    : widget.label,
+              )
+            else if (overrideLabel != null)
+              Text(overrideLabel)
+            else
+              widget.label,
           ],
         );
         final labelWithSidePadding = widget.expandWidth
-            ? labelRow
+            ? (widget.multilineLabel
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: metrics.buttonHorizontalPadding,
+                      ),
+                      child: labelRow,
+                    )
+                  : labelRow)
             : Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: metrics.buttonHorizontalPadding,
@@ -411,25 +435,39 @@ class _TermosButtonState extends State<TermosButton> {
             ),
           );
 
+          // When [multilineLabel] is enabled, the button height is driven by
+          // the wrapped label, so the parent may pass unbounded vertical
+          // constraints. [StackFit.expand] requires bounded constraints, so
+          // fall back to the loose / [Positioned.fill] composition that the
+          // non-expand branch already uses — the starfield fills the content
+          // box while the row drives the intrinsic size. With expandWidth we
+          // also need to force the tap target to fill the available width
+          // (loose stack would otherwise let it shrink to the row's natural
+          // width).
+          final useLooseStack = !widget.expandWidth || widget.multilineLabel;
+          final Widget tapTargetForStack =
+              widget.multilineLabel && widget.expandWidth
+              ? SizedBox(width: double.infinity, child: tapTarget)
+              : tapTarget;
           decorated = Container(
             decoration: BoxDecoration(
               color: cardBlend,
               borderRadius: borderRadius,
               border: Border.all(color: borderColor),
             ),
-            child: widget.expandWidth
+            child: useLooseStack
                 ? Stack(
-                    fit: StackFit.expand,
-                    children: [starfieldLayer, tapTarget],
-                  )
-                : Stack(
                     fit: StackFit.loose,
                     alignment: Alignment.center,
                     clipBehavior: Clip.none,
                     children: [
                       Positioned.fill(child: starfieldLayer),
-                      tapTarget,
+                      tapTargetForStack,
                     ],
+                  )
+                : Stack(
+                    fit: StackFit.expand,
+                    children: [starfieldLayer, tapTarget],
                   ),
           );
         } else {
@@ -459,26 +497,33 @@ class _TermosButtonState extends State<TermosButton> {
     final effectiveWidth =
         widget.width ?? (widget.expandWidth ? double.infinity : null);
     final semanticLabel = overrideLabel ?? widget.label.data ?? '';
+    final interactive = Listener(
+      onPointerDown: tapEnabled
+          ? (_) => setState(() => _pressed = true)
+          : null,
+      onPointerUp: (_) => setState(() => _pressed = false),
+      onPointerCancel: (_) => setState(() => _pressed = false),
+      child: MouseRegion(
+        onEnter: tapEnabled ? (_) => setState(() => _hovered = true) : null,
+        onExit: (_) => setState(() => _hovered = false),
+        child: animatedBuilder,
+      ),
+    );
+    final Widget sized = widget.multilineLabel
+        ? ConstrainedBox(
+            constraints: BoxConstraints(minHeight: effectiveHeight),
+            child: SizedBox(width: effectiveWidth, child: interactive),
+          )
+        : SizedBox(
+            height: effectiveHeight,
+            width: effectiveWidth,
+            child: interactive,
+          );
     return Semantics(
       button: true,
       enabled: tapEnabled,
       label: semanticLabel,
-      child: SizedBox(
-        height: effectiveHeight,
-        width: effectiveWidth,
-        child: Listener(
-          onPointerDown: tapEnabled
-              ? (_) => setState(() => _pressed = true)
-              : null,
-          onPointerUp: (_) => setState(() => _pressed = false),
-          onPointerCancel: (_) => setState(() => _pressed = false),
-          child: MouseRegion(
-            onEnter: tapEnabled ? (_) => setState(() => _hovered = true) : null,
-            onExit: (_) => setState(() => _hovered = false),
-            child: animatedBuilder,
-          ),
-        ),
-      ),
+      child: sized,
     );
   }
 }

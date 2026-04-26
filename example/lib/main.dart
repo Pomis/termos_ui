@@ -364,6 +364,12 @@ class _TermosUiExampleAppState extends State<TermosUiExampleApp> {
                     onSelectionChanged: (i) => _set(() => _segmentIndex = i),
                   ),
                 ),
+                _fullWidthSection(
+                  'TermosTabBar',
+                  colors,
+                  textStyles,
+                  const GalleryTabBarDemo(),
+                ),
                 _twoColumnRow(
                   _demoSection(
                     'TermosSwitch',

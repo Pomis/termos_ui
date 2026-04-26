@@ -18,6 +18,7 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
     this.metrics = TermosMetrics.standard,
     this.starfield = const TermosStarfieldConfig(),
     this.navBar = const TermosNavBarEffects(),
+    this.tabBar = const TermosTabBarEffects(),
     this.segmented = const TermosSegmentedEffects(),
     this.button = const TermosButtonEffects(),
     this.crt = const TermosCrtEffects(),
@@ -32,6 +33,7 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
 
   final TermosStarfieldConfig starfield;
   final TermosNavBarEffects navBar;
+  final TermosTabBarEffects tabBar;
   final TermosSegmentedEffects segmented;
   final TermosButtonEffects button;
   final TermosCrtEffects crt;
@@ -65,6 +67,7 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
     TermosMetrics? metrics,
     TermosStarfieldConfig? starfield,
     TermosNavBarEffects? navBar,
+    TermosTabBarEffects? tabBar,
     TermosSegmentedEffects? segmented,
     TermosButtonEffects? button,
     TermosCrtEffects? crt,
@@ -78,6 +81,7 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
       metrics: metrics ?? this.metrics,
       starfield: starfield ?? this.starfield,
       navBar: navBar ?? this.navBar,
+      tabBar: tabBar ?? this.tabBar,
       segmented: segmented ?? this.segmented,
       button: button ?? this.button,
       crt: crt ?? this.crt,
@@ -96,6 +100,7 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
       metrics: metrics.lerp(other.metrics, t),
       starfield: starfield.lerp(other.starfield, t),
       navBar: navBar.lerp(other.navBar, t),
+      tabBar: tabBar.lerp(other.tabBar, t),
       segmented: segmented.lerp(other.segmented, t),
       button: button.lerp(other.button, t),
       crt: crt.lerp(other.crt, t),
@@ -116,6 +121,7 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
           metrics == other.metrics &&
           starfield == other.starfield &&
           navBar == other.navBar &&
+          tabBar == other.tabBar &&
           segmented == other.segmented &&
           button == other.button &&
           crt == other.crt &&
@@ -130,6 +136,7 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
     metrics,
     starfield,
     navBar,
+    tabBar,
     segmented,
     button,
     crt,

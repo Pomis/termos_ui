@@ -32,5 +32,6 @@ export 'widgets/termos_nav_bar.dart';
 export 'widgets/termos_segmented_selector.dart';
 export 'widgets/termos_slider.dart';
 export 'widgets/termos_switch.dart';
+export 'widgets/termos_tab_bar.dart';
 export 'widgets/termos_text_field.dart';
 export 'widgets/termos_time_picker.dart';

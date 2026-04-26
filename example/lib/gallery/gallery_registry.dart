@@ -13,6 +13,7 @@ abstract final class GalleryCaptureIds {
   static const timePicker = 'time_picker';
   static const textField = 'text_field';
   static const navBar = 'nav_bar';
+  static const tabBar = 'tab_bar';
   static const crt = 'crt';
   static const sliders = 'sliders';
   static const expandableSection = 'expandable_section';
@@ -37,6 +38,7 @@ final Map<String, WidgetBuilder> galleryCaptureDemoBuilders = {
   GalleryCaptureIds.timePicker: (_) => const GalleryTimePickerDemo(),
   GalleryCaptureIds.textField: (_) => const GalleryTextFieldDemo(),
   GalleryCaptureIds.navBar: (_) => const GalleryNavBarDemo(),
+  GalleryCaptureIds.tabBar: (_) => const GalleryTabBarDemo(),
   GalleryCaptureIds.crt: (_) => const GalleryCrtDemo(),
   GalleryCaptureIds.sliders: (_) => const GallerySliderShowcase(),
   GalleryCaptureIds.expandableSection: (_) =>

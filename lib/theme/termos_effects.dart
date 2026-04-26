@@ -220,6 +220,228 @@ class TermosNavBarEffects {
       ]);
 }
 
+/// Top scrollable tab bar visuals (per theme).
+///
+/// Drives [TermosTabBar]: dot grid colouring, shell glow opacity, and the
+/// extent of the glow indicator that tracks the selected tab. Glow extent
+/// knobs ([glowSpread], [glowCore], [glowHaloSpread], [glowHaloCore]) are
+/// fractions of the strip's width — they pipe straight through to
+/// [GlowTopBorderPainter].
+class TermosTabBarEffects {
+  const TermosTabBarEffects({
+    this.glowColorMixWithWhite = 0.5,
+    this.dotGridPrimaryMixWithWhite = 0.5,
+    this.dotGridPrimaryAlphaLight = 0.5,
+    this.dotGridPrimaryAlphaDark = 1.0,
+    this.glowShellBaseOpacityLight = 0.10,
+    this.glowShellBaseOpacityDark = 0.05,
+    this.dotGridExpansionMs = 100,
+    this.dotGridDecayMs = 280,
+    this.glowSpread = 0.14,
+    this.glowCore = 0.03,
+    this.glowHaloSpread = 0.16,
+    this.glowHaloCore = 0.04,
+    this.glowHaloAlpha = 0.35,
+    this.glowHaloStrokeBoost = 10,
+    this.glowHaloBlurSigma = 6,
+    this.glowHaloCornerRadius = 8,
+    this.dotsHeightFraction = 1.0,
+    this.scrollAnimationMs = 280,
+  });
+
+  /// [Color.lerp](primary, white, this) for the indicator glow in light mode.
+  final double glowColorMixWithWhite;
+  final double dotGridPrimaryMixWithWhite;
+  final double dotGridPrimaryAlphaLight;
+  final double dotGridPrimaryAlphaDark;
+  final double glowShellBaseOpacityLight;
+  final double glowShellBaseOpacityDark;
+  final int dotGridExpansionMs;
+  final int dotGridDecayMs;
+
+  /// Outer falloff of the visible glow stroke (fraction of strip width).
+  final double glowSpread;
+
+  /// Bright-core half-width of the visible glow stroke (fraction of strip width).
+  final double glowCore;
+
+  /// Outer falloff of the blurred halo pass (fraction of strip width).
+  final double glowHaloSpread;
+
+  /// Bright-core half-width of the blurred halo pass (fraction of strip width).
+  final double glowHaloCore;
+
+  /// Peak alpha of the halo pass.
+  final double glowHaloAlpha;
+
+  /// Pixels added to the crisp stroke when drawing the halo pass.
+  final double glowHaloStrokeBoost;
+
+  /// Blur sigma used by the halo pass mask filter.
+  final double glowHaloBlurSigma;
+
+  /// Corner radius the glow path follows on each side.
+  final double glowHaloCornerRadius;
+
+  /// Vertical band of the strip occupied by the dot grid (0–1).
+  final double dotsHeightFraction;
+
+  /// Duration of the scroll-into-view animation when a tab is selected.
+  final int scrollAnimationMs;
+
+  TermosTabBarEffects copyWith({
+    double? glowColorMixWithWhite,
+    double? dotGridPrimaryMixWithWhite,
+    double? dotGridPrimaryAlphaLight,
+    double? dotGridPrimaryAlphaDark,
+    double? glowShellBaseOpacityLight,
+    double? glowShellBaseOpacityDark,
+    int? dotGridExpansionMs,
+    int? dotGridDecayMs,
+    double? glowSpread,
+    double? glowCore,
+    double? glowHaloSpread,
+    double? glowHaloCore,
+    double? glowHaloAlpha,
+    double? glowHaloStrokeBoost,
+    double? glowHaloBlurSigma,
+    double? glowHaloCornerRadius,
+    double? dotsHeightFraction,
+    int? scrollAnimationMs,
+  }) {
+    return TermosTabBarEffects(
+      glowColorMixWithWhite: glowColorMixWithWhite ?? this.glowColorMixWithWhite,
+      dotGridPrimaryMixWithWhite:
+          dotGridPrimaryMixWithWhite ?? this.dotGridPrimaryMixWithWhite,
+      dotGridPrimaryAlphaLight:
+          dotGridPrimaryAlphaLight ?? this.dotGridPrimaryAlphaLight,
+      dotGridPrimaryAlphaDark:
+          dotGridPrimaryAlphaDark ?? this.dotGridPrimaryAlphaDark,
+      glowShellBaseOpacityLight:
+          glowShellBaseOpacityLight ?? this.glowShellBaseOpacityLight,
+      glowShellBaseOpacityDark:
+          glowShellBaseOpacityDark ?? this.glowShellBaseOpacityDark,
+      dotGridExpansionMs: dotGridExpansionMs ?? this.dotGridExpansionMs,
+      dotGridDecayMs: dotGridDecayMs ?? this.dotGridDecayMs,
+      glowSpread: glowSpread ?? this.glowSpread,
+      glowCore: glowCore ?? this.glowCore,
+      glowHaloSpread: glowHaloSpread ?? this.glowHaloSpread,
+      glowHaloCore: glowHaloCore ?? this.glowHaloCore,
+      glowHaloAlpha: glowHaloAlpha ?? this.glowHaloAlpha,
+      glowHaloStrokeBoost: glowHaloStrokeBoost ?? this.glowHaloStrokeBoost,
+      glowHaloBlurSigma: glowHaloBlurSigma ?? this.glowHaloBlurSigma,
+      glowHaloCornerRadius: glowHaloCornerRadius ?? this.glowHaloCornerRadius,
+      dotsHeightFraction: dotsHeightFraction ?? this.dotsHeightFraction,
+      scrollAnimationMs: scrollAnimationMs ?? this.scrollAnimationMs,
+    );
+  }
+
+  TermosTabBarEffects lerp(TermosTabBarEffects other, double t) {
+    return TermosTabBarEffects(
+      glowColorMixWithWhite:
+          lerpDouble(glowColorMixWithWhite, other.glowColorMixWithWhite, t)!,
+      dotGridPrimaryMixWithWhite: lerpDouble(
+        dotGridPrimaryMixWithWhite,
+        other.dotGridPrimaryMixWithWhite,
+        t,
+      )!,
+      dotGridPrimaryAlphaLight: lerpDouble(
+        dotGridPrimaryAlphaLight,
+        other.dotGridPrimaryAlphaLight,
+        t,
+      )!,
+      dotGridPrimaryAlphaDark: lerpDouble(
+        dotGridPrimaryAlphaDark,
+        other.dotGridPrimaryAlphaDark,
+        t,
+      )!,
+      glowShellBaseOpacityLight: lerpDouble(
+        glowShellBaseOpacityLight,
+        other.glowShellBaseOpacityLight,
+        t,
+      )!,
+      glowShellBaseOpacityDark: lerpDouble(
+        glowShellBaseOpacityDark,
+        other.glowShellBaseOpacityDark,
+        t,
+      )!,
+      dotGridExpansionMs: lerpDouble(
+        dotGridExpansionMs.toDouble(),
+        other.dotGridExpansionMs.toDouble(),
+        t,
+      )!.round(),
+      dotGridDecayMs: lerpDouble(
+        dotGridDecayMs.toDouble(),
+        other.dotGridDecayMs.toDouble(),
+        t,
+      )!.round(),
+      glowSpread: lerpDouble(glowSpread, other.glowSpread, t)!,
+      glowCore: lerpDouble(glowCore, other.glowCore, t)!,
+      glowHaloSpread: lerpDouble(glowHaloSpread, other.glowHaloSpread, t)!,
+      glowHaloCore: lerpDouble(glowHaloCore, other.glowHaloCore, t)!,
+      glowHaloAlpha: lerpDouble(glowHaloAlpha, other.glowHaloAlpha, t)!,
+      glowHaloStrokeBoost:
+          lerpDouble(glowHaloStrokeBoost, other.glowHaloStrokeBoost, t)!,
+      glowHaloBlurSigma:
+          lerpDouble(glowHaloBlurSigma, other.glowHaloBlurSigma, t)!,
+      glowHaloCornerRadius:
+          lerpDouble(glowHaloCornerRadius, other.glowHaloCornerRadius, t)!,
+      dotsHeightFraction:
+          lerpDouble(dotsHeightFraction, other.dotsHeightFraction, t)!,
+      scrollAnimationMs: lerpDouble(
+        scrollAnimationMs.toDouble(),
+        other.scrollAnimationMs.toDouble(),
+        t,
+      )!.round(),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TermosTabBarEffects &&
+          glowColorMixWithWhite == other.glowColorMixWithWhite &&
+          dotGridPrimaryMixWithWhite == other.dotGridPrimaryMixWithWhite &&
+          dotGridPrimaryAlphaLight == other.dotGridPrimaryAlphaLight &&
+          dotGridPrimaryAlphaDark == other.dotGridPrimaryAlphaDark &&
+          glowShellBaseOpacityLight == other.glowShellBaseOpacityLight &&
+          glowShellBaseOpacityDark == other.glowShellBaseOpacityDark &&
+          dotGridExpansionMs == other.dotGridExpansionMs &&
+          dotGridDecayMs == other.dotGridDecayMs &&
+          glowSpread == other.glowSpread &&
+          glowCore == other.glowCore &&
+          glowHaloSpread == other.glowHaloSpread &&
+          glowHaloCore == other.glowHaloCore &&
+          glowHaloAlpha == other.glowHaloAlpha &&
+          glowHaloStrokeBoost == other.glowHaloStrokeBoost &&
+          glowHaloBlurSigma == other.glowHaloBlurSigma &&
+          glowHaloCornerRadius == other.glowHaloCornerRadius &&
+          dotsHeightFraction == other.dotsHeightFraction &&
+          scrollAnimationMs == other.scrollAnimationMs;
+
+  @override
+  int get hashCode => Object.hashAll([
+        glowColorMixWithWhite,
+        dotGridPrimaryMixWithWhite,
+        dotGridPrimaryAlphaLight,
+        dotGridPrimaryAlphaDark,
+        glowShellBaseOpacityLight,
+        glowShellBaseOpacityDark,
+        dotGridExpansionMs,
+        dotGridDecayMs,
+        glowSpread,
+        glowCore,
+        glowHaloSpread,
+        glowHaloCore,
+        glowHaloAlpha,
+        glowHaloStrokeBoost,
+        glowHaloBlurSigma,
+        glowHaloCornerRadius,
+        dotsHeightFraction,
+        scrollAnimationMs,
+      ]);
+}
+
 /// Time picker drum styling (per theme).
 class TermosTimePickerEffects {
   const TermosTimePickerEffects({

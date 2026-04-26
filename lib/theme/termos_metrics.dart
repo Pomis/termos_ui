@@ -15,6 +15,7 @@ class TermosMetrics {
     this.buttonLoadingSpinnerSize = 16,
     this.buttonLoadingSpinnerSlotSize = 20,
     this.buttonDisabledTransitionMs = 200,
+
     /// Left/right inset for label + icon when the button shrink-wraps ([TermosButton.expandWidth] false).
     this.buttonHorizontalPadding = 16,
     // ── Back button ──
@@ -38,6 +39,11 @@ class TermosMetrics {
     // ── Segmented selector ──
     this.segmentedHeight = 44,
     this.segmentedGlowAnimationMs = 320,
+    // ── Tab bar (top, scrollable) ──
+    this.tabBarStripHeight = 44,
+    this.tabBarTabHorizontalPadding = 16,
+    this.tabBarOuterPadding = 10,
+    this.tabBarGlowStrokeWidth = 2,
     // ── Time picker ──
     this.timePickerWheelWidth = 72,
     this.timePickerItemExtent = 40,
@@ -89,6 +95,11 @@ class TermosMetrics {
   final double segmentedHeight;
   final int segmentedGlowAnimationMs;
 
+  final double tabBarStripHeight;
+  final double tabBarTabHorizontalPadding;
+  final double tabBarOuterPadding;
+  final double tabBarGlowStrokeWidth;
+
   final double timePickerWheelWidth;
   final double timePickerItemExtent;
   final int timePickerVisibleItems;
@@ -138,6 +149,10 @@ class TermosMetrics {
     int? navBarBorderAnimationMs,
     double? segmentedHeight,
     int? segmentedGlowAnimationMs,
+    double? tabBarStripHeight,
+    double? tabBarTabHorizontalPadding,
+    double? tabBarOuterPadding,
+    double? tabBarGlowStrokeWidth,
     double? timePickerWheelWidth,
     double? timePickerItemExtent,
     int? timePickerVisibleItems,
@@ -176,6 +191,10 @@ class TermosMetrics {
       navBarBorderAnimationMs: navBarBorderAnimationMs ?? this.navBarBorderAnimationMs,
       segmentedHeight: segmentedHeight ?? this.segmentedHeight,
       segmentedGlowAnimationMs: segmentedGlowAnimationMs ?? this.segmentedGlowAnimationMs,
+      tabBarStripHeight: tabBarStripHeight ?? this.tabBarStripHeight,
+      tabBarTabHorizontalPadding: tabBarTabHorizontalPadding ?? this.tabBarTabHorizontalPadding,
+      tabBarOuterPadding: tabBarOuterPadding ?? this.tabBarOuterPadding,
+      tabBarGlowStrokeWidth: tabBarGlowStrokeWidth ?? this.tabBarGlowStrokeWidth,
       timePickerWheelWidth: timePickerWheelWidth ?? this.timePickerWheelWidth,
       timePickerItemExtent: timePickerItemExtent ?? this.timePickerItemExtent,
       timePickerVisibleItems: timePickerVisibleItems ?? this.timePickerVisibleItems,
@@ -262,6 +281,14 @@ class TermosMetrics {
         other.segmentedGlowAnimationMs.toDouble(),
         t,
       )!.round(),
+      tabBarStripHeight: lerpDouble(tabBarStripHeight, other.tabBarStripHeight, t)!,
+      tabBarTabHorizontalPadding: lerpDouble(
+        tabBarTabHorizontalPadding,
+        other.tabBarTabHorizontalPadding,
+        t,
+      )!,
+      tabBarOuterPadding: lerpDouble(tabBarOuterPadding, other.tabBarOuterPadding, t)!,
+      tabBarGlowStrokeWidth: lerpDouble(tabBarGlowStrokeWidth, other.tabBarGlowStrokeWidth, t)!,
       timePickerWheelWidth: lerpDouble(timePickerWheelWidth, other.timePickerWheelWidth, t)!,
       timePickerItemExtent: lerpDouble(timePickerItemExtent, other.timePickerItemExtent, t)!,
       timePickerVisibleItems: lerpDouble(
@@ -315,6 +342,10 @@ class TermosMetrics {
           navBarBorderAnimationMs == other.navBarBorderAnimationMs &&
           segmentedHeight == other.segmentedHeight &&
           segmentedGlowAnimationMs == other.segmentedGlowAnimationMs &&
+          tabBarStripHeight == other.tabBarStripHeight &&
+          tabBarTabHorizontalPadding == other.tabBarTabHorizontalPadding &&
+          tabBarOuterPadding == other.tabBarOuterPadding &&
+          tabBarGlowStrokeWidth == other.tabBarGlowStrokeWidth &&
           timePickerWheelWidth == other.timePickerWheelWidth &&
           timePickerItemExtent == other.timePickerItemExtent &&
           timePickerVisibleItems == other.timePickerVisibleItems &&
@@ -351,6 +382,10 @@ class TermosMetrics {
     navBarBorderAnimationMs,
     segmentedHeight,
     segmentedGlowAnimationMs,
+    tabBarStripHeight,
+    tabBarTabHorizontalPadding,
+    tabBarOuterPadding,
+    tabBarGlowStrokeWidth,
     timePickerWheelWidth,
     timePickerItemExtent,
     timePickerVisibleItems,

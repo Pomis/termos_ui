@@ -335,6 +335,81 @@ class _GalleryNavBarDemoState extends State<GalleryNavBarDemo> {
   }
 }
 
+/// Top scrollable tab bar wired to a [TabBarView] so the swipe-tracking glow
+/// is demonstrable. Owns its [TabController] via [TickerProviderStateMixin].
+class GalleryTabBarDemo extends StatefulWidget {
+  const GalleryTabBarDemo({super.key});
+
+  @override
+  State<GalleryTabBarDemo> createState() => _GalleryTabBarDemoState();
+}
+
+class _GalleryTabBarDemoState extends State<GalleryTabBarDemo>
+    with TickerProviderStateMixin {
+  static const _tabs = [
+    TermosTabBarItem(label: 'Overview'),
+    TermosTabBarItem(label: 'Activity'),
+    TermosTabBarItem(label: 'Devices'),
+    TermosTabBarItem(label: 'Notifications'),
+    TermosTabBarItem(label: 'Audit log'),
+  ];
+
+  late final TabController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TabController(length: _tabs.length, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final termos = TermosTheme.of(context);
+    final colors = termos.colors;
+    final textStyles = termos.textStyles;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TermosTabBar(
+          items: _tabs,
+          controller: _controller,
+        ),
+        SizedBox(
+          height: 220,
+          child: TabBarView(
+            controller: _controller,
+            children: [
+              for (final tab in _tabs)
+                Container(
+                  margin: const EdgeInsets.only(top: 12),
+                  decoration: BoxDecoration(
+                    color: colors.card,
+                    borderRadius:
+                        BorderRadius.circular(termos.metrics.borderRadius),
+                    border: Border.all(color: colors.border),
+                  ),
+                  child: Center(
+                    child: Text(
+                      tab.label,
+                      style: textStyles.sectionTitle(colors.textPrimary),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 /// CRT viewport block with sample copy (reads theme from context).
 class GalleryCrtDemo extends StatelessWidget {
   const GalleryCrtDemo({super.key});
