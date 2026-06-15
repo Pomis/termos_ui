@@ -85,6 +85,7 @@ const bool _kDebugTypingDelays = false;
 class _TermosButtonState extends State<TermosButton> {
   bool _hovered = false;
   bool _pressed = false;
+  bool _deferPressedFrame = false;
 
   final DotGridController _dotGridController = DotGridController();
   late final int _starfieldSeed;
@@ -244,6 +245,7 @@ class _TermosButtonState extends State<TermosButton> {
 
   @override
   void dispose() {
+    _deferPressedFrame = false;
     _cancelTypingTimer();
     _dotGridController.dispose();
     super.dispose();
@@ -300,6 +302,9 @@ class _TermosButtonState extends State<TermosButton> {
     );
     final disabledTransitionDuration = metrics.buttonDisabledTransitionDuration;
     const disabledTransitionCurve = Curves.easeInOut;
+    final effectiveHeight = widget.height ?? metrics.buttonHeight;
+    final effectiveWidth =
+        widget.width ?? (widget.expandWidth ? double.infinity : null);
 
     final animatedBuilder = TweenAnimationBuilder<double>(
       key: ValueKey(isDisabled),
@@ -398,6 +403,12 @@ class _TermosButtonState extends State<TermosButton> {
         final Widget decorated;
         if (useHeavyVisualEffects) {
           final shrinkTap = !widget.expandWidth && widget.width == null;
+          final tapTargetChild = widget.multilineLabel && widget.expandWidth
+              ? ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: effectiveHeight),
+                  child: content,
+                )
+              : content;
           final tapTarget = TermosTapTarget(
             controller:
                 widget.typingLoadingTransition && !isSaved && !isTransitioning
@@ -414,7 +425,7 @@ class _TermosButtonState extends State<TermosButton> {
             gridSpacing: dg.spacing,
             idleMeshColor: colors.dotGridIdleMesh,
             shrinkWrapWidth: shrinkTap,
-            child: content,
+            child: tapTargetChild,
           );
 
           final starfieldLayer = ClipRRect(
@@ -493,16 +504,37 @@ class _TermosButtonState extends State<TermosButton> {
       },
     );
 
-    final effectiveHeight = widget.height ?? metrics.buttonHeight;
-    final effectiveWidth =
-        widget.width ?? (widget.expandWidth ? double.infinity : null);
     final semanticLabel = overrideLabel ?? widget.label.data ?? '';
     final interactive = Listener(
       onPointerDown: tapEnabled
-          ? (_) => setState(() => _pressed = true)
+          ? (_) {
+              // Updating pressed state synchronously rebuilds InkWell /
+              // TermosTapTarget during pointer dispatch and cancels the inner
+              // tap (often feels like «first tap does nothing»). Defer layout
+              // until after this frame while still cancelling if pointer is
+              // released before paint.
+              _deferPressedFrame = true;
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!mounted) return;
+                if (!_deferPressedFrame) return;
+                setState(() => _pressed = true);
+              });
+            }
           : null,
-      onPointerUp: (_) => setState(() => _pressed = false),
-      onPointerCancel: (_) => setState(() => _pressed = false),
+      onPointerUp: (_) {
+        _deferPressedFrame = false;
+        if (!_pressed) return;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) setState(() => _pressed = false);
+        });
+      },
+      onPointerCancel: (_) {
+        _deferPressedFrame = false;
+        if (!_pressed) return;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) setState(() => _pressed = false);
+        });
+      },
       child: MouseRegion(
         onEnter: tapEnabled ? (_) => setState(() => _hovered = true) : null,
         onExit: (_) => setState(() => _hovered = false),

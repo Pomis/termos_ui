@@ -44,7 +44,17 @@ class TermosTextField extends StatefulWidget {
     this.textInputAction,
     this.keyboardType,
     this.inputFormatters,
+    this.textAlignVertical,
+    this.prefixIcon,
     this.suffixIcon,
+    this.prefixIconConstraints,
+    this.suffixIconConstraints,
+    this.contentPadding = const EdgeInsets.symmetric(
+      horizontal: 20,
+      vertical: 14,
+    ),
+    this.height,
+    this.glowCenterY,
     this.labelSpacing = 8,
   });
 
@@ -76,7 +86,23 @@ class TermosTextField extends StatefulWidget {
   final TextInputAction? textInputAction;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
+  final TextAlignVertical? textAlignVertical;
+  final Widget? prefixIcon;
   final Widget? suffixIcon;
+  final BoxConstraints? prefixIconConstraints;
+  final BoxConstraints? suffixIconConstraints;
+
+  /// Padding around the inner [TextField]. Defaults to the original
+  /// TermosTextField inset so existing call sites keep the same size.
+  final EdgeInsetsGeometry contentPadding;
+
+  /// Optional fixed height for compact one-line uses such as search bars.
+  /// Leave null for the field to size itself from [contentPadding].
+  final double? height;
+
+  /// Optional override for the focused edge glow / starfield center. When
+  /// null, the legacy minLines-based placement is used.
+  final double? glowCenterY;
 
   /// Vertical gap between [label] and the text field (default 8).
   final double labelSpacing;
@@ -135,10 +161,25 @@ class _TermosTextFieldState extends State<TermosTextField> {
   }
 
   double _resolvedGlowY() {
+    final custom = widget.glowCenterY;
+    if (custom != null) return custom;
     final ml = widget.minLines ?? 1;
     if (ml >= 4) return 52;
     if (ml >= 2) return 34;
     return 26;
+  }
+
+  Widget _content(Widget child) {
+    final padded = Padding(padding: widget.contentPadding, child: child);
+    if (widget.height == null) return padded;
+    return Positioned.fill(
+      child: Align(alignment: Alignment.center, child: padded),
+    );
+  }
+
+  void _focusFromChrome() {
+    if (!widget.enabled) return;
+    _focusNode.requestFocus();
   }
 
   @override
@@ -151,21 +192,21 @@ class _TermosTextFieldState extends State<TermosTextField> {
     final isLight = colors.background.computeLuminance() > 0.5;
     final focused = _focusNode.hasFocus;
 
-    final resolvedStyle = widget.style ??
+    final resolvedStyle =
+        widget.style ??
         (widget.textFieldStyle == TermosTextFieldStyle.code
             ? textStyles.codePrimary(colors.textPrimary)
-            : textStyles.body(colors.textPrimary).copyWith(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                ));
+            : textStyles
+                  .body(colors.textPrimary)
+                  .copyWith(fontSize: 15, fontWeight: FontWeight.w500));
 
-    final resolvedHintStyle = widget.hintStyle ??
+    final resolvedHintStyle =
+        widget.hintStyle ??
         (widget.textFieldStyle == TermosTextFieldStyle.code
             ? textStyles.codePrimary(colors.textMuted)
-            : textStyles.body(colors.textMuted).copyWith(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                ));
+            : textStyles
+                  .body(colors.textMuted)
+                  .copyWith(fontSize: 15, fontWeight: FontWeight.w500));
 
     final borderRadius = BorderRadius.circular(metrics.borderRadius);
     final meshPrimaryAlpha = isLight ? 0.65 : 0.45;
@@ -184,6 +225,7 @@ class _TermosTextFieldState extends State<TermosTextField> {
       textInputAction: widget.textInputAction,
       keyboardType: widget.keyboardType,
       inputFormatters: widget.inputFormatters,
+      textAlignVertical: widget.textAlignVertical,
       onSubmitted: widget.onSubmitted,
       onChanged: widget.onChanged,
       decoration: InputDecoration(
@@ -200,9 +242,15 @@ class _TermosTextFieldState extends State<TermosTextField> {
         errorBorder: InputBorder.none,
         focusedErrorBorder: InputBorder.none,
         contentPadding: EdgeInsets.zero,
+        prefixIcon: widget.prefixIcon,
+        prefixIconConstraints: widget.prefixIcon != null
+            ? widget.prefixIconConstraints ??
+                  const BoxConstraints(minHeight: 40, minWidth: 40)
+            : null,
         suffixIcon: widget.suffixIcon,
         suffixIconConstraints: widget.suffixIcon != null
-            ? const BoxConstraints(minHeight: 40, minWidth: 40)
+            ? widget.suffixIconConstraints ??
+                  const BoxConstraints(minHeight: 40, minWidth: 40)
             : null,
       ),
     );
@@ -229,8 +277,7 @@ class _TermosTextFieldState extends State<TermosTextField> {
           child: DotGridWidget(
             dotSize: dotGrid.dotSize,
             gridSpacing: dotGrid.spacing,
-            primaryColor:
-                colors.primary.withValues(alpha: meshPrimaryAlpha),
+            primaryColor: colors.primary.withValues(alpha: meshPrimaryAlpha),
             backgroundColor: colors.dotGridIdleMesh,
             blobRadius: dotGrid.blobRadius,
             enableHoverEffect: false,
@@ -261,11 +308,7 @@ class _TermosTextFieldState extends State<TermosTextField> {
                       ),
                     ),
                   ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 14),
-                  child: textField,
-                ),
+                _content(textField),
               ],
             ),
           ),
@@ -283,11 +326,7 @@ class _TermosTextFieldState extends State<TermosTextField> {
                     : Colors.black.withValues(alpha: 0.35),
               ),
             ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-              child: textField,
-            ),
+            _content(textField),
           ],
         ),
       );
@@ -300,8 +339,16 @@ class _TermosTextFieldState extends State<TermosTextField> {
       ),
       child: panel,
     );
+    final sizedField = widget.height == null
+        ? field
+        : SizedBox(height: widget.height, child: field);
+    final focusableField = GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: _focusFromChrome,
+      child: sizedField,
+    );
 
-    if (widget.label == null) return field;
+    if (widget.label == null) return focusableField;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,13 +356,12 @@ class _TermosTextFieldState extends State<TermosTextField> {
       children: [
         Text(
           widget.label!,
-          style: textStyles.body(colors.textPrimary).copyWith(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
+          style: textStyles
+              .body(colors.textPrimary)
+              .copyWith(fontSize: 14, fontWeight: FontWeight.w600),
         ),
         SizedBox(height: widget.labelSpacing),
-        field,
+        focusableField,
       ],
     );
   }

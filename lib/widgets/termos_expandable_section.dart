@@ -15,7 +15,9 @@ import '../theme/termos_theme.dart';
 ///
 /// Background uses [ReactiveStarfieldPainter] aligned to the surrounding
 /// dot-grid group (if any). When [useOverlayTapTarget] is true, an overlay
-/// [TermosTapTarget] provides dot-grid mesh feedback on tap.
+/// [TermosTapTarget] provides dot-grid mesh feedback on tap. When false, the
+/// visible card content is still tappable, but nested controls can handle
+/// their own taps.
 class TermosExpandableSection extends StatefulWidget {
   const TermosExpandableSection({
     super.key,
@@ -29,8 +31,7 @@ class TermosExpandableSection extends StatefulWidget {
     this.useOverlayTapTarget = true,
     this.showExpandIcon = true,
     this.padding = const EdgeInsets.fromLTRB(12, 10, 12, 12),
-    this.contentBetweenPadding =
-        const EdgeInsets.symmetric(horizontal: 12),
+    this.contentBetweenPadding = const EdgeInsets.symmetric(horizontal: 12),
     this.expandedPadding = const EdgeInsets.fromLTRB(12, 8, 12, 12),
     this.contentBetweenSpacing = 10,
     this.borderRadius,
@@ -63,7 +64,8 @@ class TermosExpandableSection extends StatefulWidget {
 
   /// When true (default) places a [TermosTapTarget] above the content so the
   /// dot-grid mesh feedback paints over the whole card. When false, taps are
-  /// captured on the header row only via a [GestureDetector].
+  /// captured by a [GestureDetector] around the content so nested controls can
+  /// still receive their own gestures.
   final bool useOverlayTapTarget;
 
   /// Show the rotating arrow at the end of the header row.
@@ -168,7 +170,8 @@ class _TermosExpandableSectionState extends State<TermosExpandableSection>
     final dg = termos.dotGrid;
     final hasExpanded = widget.expandedChild != null;
     final accentColor = widget.accentColor ?? colors.primary;
-    final radius = widget.borderRadius ??
+    final radius =
+        widget.borderRadius ??
         BorderRadius.circular(metrics.borderRadius * 1.75);
     final isLight = Theme.of(context).brightness == Brightness.light;
 
@@ -179,31 +182,19 @@ class _TermosExpandableSectionState extends State<TermosExpandableSection>
           const SizedBox(width: 8),
           RotationTransition(
             turns: Tween(begin: 0.0, end: 0.5).animate(_expandAnimation),
-            child: widget.expandIcon ??
-                Icon(
-                  Icons.expand_more,
-                  color: colors.textSecondary,
-                  size: 20,
-                ),
+            child:
+                widget.expandIcon ??
+                Icon(Icons.expand_more, color: colors.textSecondary, size: 20),
           ),
         ],
       ],
     );
 
-    final content = Column(
+    final contentBody = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: widget.padding,
-          child: widget.useOverlayTapTarget
-              ? headerRow
-              : GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: hasExpanded ? _toggleExpanded : null,
-                  child: headerRow,
-                ),
-        ),
+        Padding(padding: widget.padding, child: headerRow),
         if (widget.contentBetween != null) ...[
           Padding(
             padding: widget.contentBetweenPadding,
@@ -223,6 +214,14 @@ class _TermosExpandableSectionState extends State<TermosExpandableSection>
       ],
     );
 
+    final content = widget.useOverlayTapTarget
+        ? contentBody
+        : GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: hasExpanded ? _toggleExpanded : null,
+            child: contentBody,
+          );
+
     final tapOverlay = widget.useOverlayTapTarget
         ? Positioned.fill(
             child: TermosTapTarget(
@@ -241,11 +240,7 @@ class _TermosExpandableSectionState extends State<TermosExpandableSection>
 
     return Container(
       decoration: BoxDecoration(
-        color: Color.lerp(
-          colors.background,
-          colors.card,
-          isLight ? 0.4 : 0.6,
-        )!,
+        color: Color.lerp(colors.background, colors.card, isLight ? 0.4 : 0.6)!,
         borderRadius: radius,
         border: Border.all(color: colors.dotGridButtonBorder),
       ),
