@@ -1,6 +1,6 @@
 name: termos_ui
 description: Maximalist Flutter UI widgets with dot-grid mesh, starfield particles, CRT scanlines, and themed controls.
-version: 0.1.0
+version: 0.1.1
 repository: https://github.com/Pomis/terminaster/tree/main/packages/termos_ui
 issue_tracker: https://github.com/Pomis/terminaster/issues
 
