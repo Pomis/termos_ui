@@ -4,6 +4,7 @@ import 'dot_grid_config.dart';
 import 'termos_colors.dart';
 import 'termos_effects.dart';
 import 'termos_metrics.dart';
+import 'termos_nav_bar_style.dart';
 import 'termos_text_styles.dart';
 
 /// Central theme for all Termos widgets: layout, dot grid, colors, typography, effects.
@@ -18,6 +19,7 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
     this.metrics = TermosMetrics.standard,
     this.starfield = const TermosStarfieldConfig(),
     this.navBar = const TermosNavBarEffects(),
+    this.navBarStyle = const TermosNavBarStyle.solid(),
     this.tabBar = const TermosTabBarEffects(),
     this.segmented = const TermosSegmentedEffects(),
     this.button = const TermosButtonEffects(),
@@ -33,6 +35,10 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
 
   final TermosStarfieldConfig starfield;
   final TermosNavBarEffects navBar;
+
+  /// Shell treatment for [TermosNavBar]: solid (default) or glass.
+  final TermosNavBarStyle navBarStyle;
+
   final TermosTabBarEffects tabBar;
   final TermosSegmentedEffects segmented;
   final TermosButtonEffects button;
@@ -67,6 +73,7 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
     TermosMetrics? metrics,
     TermosStarfieldConfig? starfield,
     TermosNavBarEffects? navBar,
+    TermosNavBarStyle? navBarStyle,
     TermosTabBarEffects? tabBar,
     TermosSegmentedEffects? segmented,
     TermosButtonEffects? button,
@@ -81,6 +88,7 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
       metrics: metrics ?? this.metrics,
       starfield: starfield ?? this.starfield,
       navBar: navBar ?? this.navBar,
+      navBarStyle: navBarStyle ?? this.navBarStyle,
       tabBar: tabBar ?? this.tabBar,
       segmented: segmented ?? this.segmented,
       button: button ?? this.button,
@@ -100,6 +108,9 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
       metrics: metrics.lerp(other.metrics, t),
       starfield: starfield.lerp(other.starfield, t),
       navBar: navBar.lerp(other.navBar, t),
+      navBarStyle:
+          TermosNavBarStyle.lerp(navBarStyle, other.navBarStyle, t) ??
+          navBarStyle,
       tabBar: tabBar.lerp(other.tabBar, t),
       segmented: segmented.lerp(other.segmented, t),
       button: button.lerp(other.button, t),
@@ -121,6 +132,7 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
           metrics == other.metrics &&
           starfield == other.starfield &&
           navBar == other.navBar &&
+          navBarStyle == other.navBarStyle &&
           tabBar == other.tabBar &&
           segmented == other.segmented &&
           button == other.button &&
@@ -136,6 +148,7 @@ class TermosThemeData extends ThemeExtension<TermosThemeData> {
     metrics,
     starfield,
     navBar,
+    navBarStyle,
     tabBar,
     segmented,
     button,

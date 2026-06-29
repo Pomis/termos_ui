@@ -4,6 +4,8 @@
 
 Maximalist Flutter widgets with a terminal-inspired look: an interactive **dot-grid mesh** that ripples under your finger, **starfield** glow, and **CRT scanlines** — wired into a themeable set of buttons, sliders, nav bars, and inputs.
 
+This is the official visual language of [Terminaster](https://pomisoft.dev/terminaster) (turn real commands into cards you'll actually remember) and [Sink In](https://pomisoft.dev/sink-in) (phrasal verbs that sink in) by [Pomisoft](https://pomisoft.dev).
+
 ![termos_ui widget gallery](example/doc/hero.png)
 
 > ⚠️ Not ready for production use — the API is still settling and may change between releases.
@@ -93,6 +95,12 @@ the full parameter list.
 | **Switch** | **Sliders** | **Text field** |
 | ![Time picker](example/doc/gallery/time_picker.gif) | ![CRT](example/doc/gallery/crt.gif) | ![Loader](example/doc/gallery/loading_indicator.gif) |
 | **Time picker** | **CRT** | **Loader** |
+
+### Usage examples
+
+`TermosNavBar` in a real app — the top-edge glow tracks the selected tab:
+
+![Nav bar in a real app](example/doc/gallery/usage_nav_bar.gif)
 
 ## Theming
 
