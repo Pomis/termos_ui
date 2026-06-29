@@ -303,259 +303,285 @@ class _TermosButtonState extends State<TermosButton> {
     final disabledTransitionDuration = metrics.buttonDisabledTransitionDuration;
     const disabledTransitionCurve = Curves.easeInOut;
     final effectiveHeight = widget.height ?? metrics.buttonHeight;
-    final effectiveWidth =
-        widget.width ?? (widget.expandWidth ? double.infinity : null);
+    final requestedWidth = widget.width;
+    final fixedWidth = requestedWidth != null && requestedWidth.isFinite
+        ? requestedWidth
+        : null;
+    final wantsAvailableWidth =
+        widget.expandWidth ||
+        (requestedWidth != null && requestedWidth.isInfinite);
 
-    final animatedBuilder = TweenAnimationBuilder<double>(
-      key: ValueKey(isDisabled),
-      tween: Tween(begin: isDisabled ? 0 : 1, end: isDisabled ? 1 : 0),
-      duration: disabledTransitionDuration,
-      curve: disabledTransitionCurve,
-      builder: (context, t, _) {
-        final borderColor = Color.lerp(
-          enabledBorderColor,
-          colors.textMuted,
-          t,
-        )!;
-        final contentColor = Color.lerp(
-          accentColor,
-          colors.textMuted.withValues(alpha: buttonEffects.contentMutedAlpha),
-          t,
-        )!;
-        final glowColor = Color.lerp(accentColor, colors.textMuted, t)!;
-        final isLight = Theme.of(context).brightness == Brightness.light;
-        final glowIntensity =
-            t * starfield.intensityButtonDisabledBlend +
-            (1 - t) *
-                (isLight
-                    ? starfield.intensityButtonLight
-                    : starfield.intensityButtonDark);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final effectiveWidth =
+            fixedWidth ??
+            (wantsAvailableWidth && constraints.hasBoundedWidth
+                ? constraints.maxWidth
+                : null);
+        final expandsForLayout =
+            widget.expandWidth && effectiveWidth != null && wantsAvailableWidth;
 
-        final labelRow = Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (showSpinner) ...[
-              SizedBox(
-                width: metrics.buttonLoadingSpinnerSlotSize,
-                height: metrics.buttonLoadingSpinnerSlotSize,
-                child: TermosLoadingIndicator(
-                  size: metrics.buttonLoadingSpinnerSize,
-                  color: accentColor,
-                ),
+        final animatedBuilder = TweenAnimationBuilder<double>(
+          key: ValueKey(isDisabled),
+          tween: Tween(begin: isDisabled ? 0 : 1, end: isDisabled ? 1 : 0),
+          duration: disabledTransitionDuration,
+          curve: disabledTransitionCurve,
+          builder: (context, t, _) {
+            final borderColor = Color.lerp(
+              enabledBorderColor,
+              colors.textMuted,
+              t,
+            )!;
+            final contentColor = Color.lerp(
+              accentColor,
+              colors.textMuted.withValues(
+                alpha: buttonEffects.contentMutedAlpha,
               ),
-              SizedBox(width: metrics.buttonIconSpacing),
-            ] else if (displayIcon != null) ...[
-              TermosIconSlot(
-                icon: displayIcon,
-                tintColor: contentColor,
-                slotSize: metrics.buttonIconSize,
-              ),
-              SizedBox(width: metrics.buttonIconSpacing),
-            ],
-            if (widget.multilineLabel)
-              Flexible(
-                child: overrideLabel != null
-                    ? Text(overrideLabel)
-                    : widget.label,
-              )
-            else if (overrideLabel != null)
-              Text(overrideLabel)
-            else
-              widget.label,
-          ],
-        );
-        final labelWithSidePadding = widget.expandWidth
-            ? (widget.multilineLabel
-                  ? Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: metrics.buttonHorizontalPadding,
-                      ),
-                      child: labelRow,
-                    )
-                  : labelRow)
-            : Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: metrics.buttonHorizontalPadding,
-                ),
-                child: labelRow,
-              );
-        final content = DefaultTextStyle.merge(
-          style: textStyles.terminalHeader(contentColor),
-          child: widget.expandWidth
-              ? Center(child: labelWithSidePadding)
-              : Align(
-                  alignment: Alignment.center,
-                  widthFactor: 1.0,
-                  heightFactor: 1.0,
-                  child: labelWithSidePadding,
-                ),
-        );
+              t,
+            )!;
+            final glowColor = Color.lerp(accentColor, colors.textMuted, t)!;
+            final isLight = Theme.of(context).brightness == Brightness.light;
+            final glowIntensity =
+                t * starfield.intensityButtonDisabledBlend +
+                (1 - t) *
+                    (isLight
+                        ? starfield.intensityButtonLight
+                        : starfield.intensityButtonDark);
 
-        final borderRadius =
-            widget.borderRadius ?? BorderRadius.circular(metrics.borderRadius);
-        final cardBlend = Color.lerp(
-          colors.background,
-          colors.card,
-          isLight ? buttonEffects.cardBlendLight : buttonEffects.cardBlendDark,
-        )!;
-
-        final Widget decorated;
-        if (useHeavyVisualEffects) {
-          final shrinkTap = !widget.expandWidth && widget.width == null;
-          final tapTargetChild = widget.multilineLabel && widget.expandWidth
-              ? ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: effectiveHeight),
-                  child: content,
-                )
-              : content;
-          final tapTarget = TermosTapTarget(
-            controller:
-                widget.typingLoadingTransition && !isSaved && !isTransitioning
-                ? _dotGridController
-                : null,
-            onTap: tapEnabled ? widget.onTap : null,
-            enabled:
-                tapEnabled ||
-                (widget.typingLoadingTransition && widget.isLoading),
-            borderRadius: borderRadius,
-            primaryColor: accentColor,
-            blobRadius: dg.blobRadius,
-            dotSize: dg.dotSize,
-            gridSpacing: dg.spacing,
-            idleMeshColor: colors.dotGridIdleMesh,
-            shrinkWrapWidth: shrinkTap,
-            child: tapTargetChild,
-          );
-
-          final starfieldLayer = ClipRRect(
-            borderRadius: borderRadius,
-            child: TermosAlignedBuilder(
-              builder: (gridOffset) => CustomPaint(
-                painter: ReactiveStarfieldPainter(
-                  dotSize: dg.dotSize,
-                  gridSpacing: dg.spacing,
-                  glowPosition: starfield.glowPositionButton,
-                  glowColor: glowColor,
-                  intensity: glowIntensity,
-                  gridOffset: gridOffset,
-                  seed: _starfieldSeed,
-                  glowRadiusFraction: starfield.glowRadiusFraction,
-                ),
-              ),
-            ),
-          );
-
-          // When [multilineLabel] is enabled, the button height is driven by
-          // the wrapped label, so the parent may pass unbounded vertical
-          // constraints. [StackFit.expand] requires bounded constraints, so
-          // fall back to the loose / [Positioned.fill] composition that the
-          // non-expand branch already uses — the starfield fills the content
-          // box while the row drives the intrinsic size. With expandWidth we
-          // also need to force the tap target to fill the available width
-          // (loose stack would otherwise let it shrink to the row's natural
-          // width).
-          final useLooseStack = !widget.expandWidth || widget.multilineLabel;
-          final Widget tapTargetForStack =
-              widget.multilineLabel && widget.expandWidth
-              ? SizedBox(width: double.infinity, child: tapTarget)
-              : tapTarget;
-          decorated = Container(
-            decoration: BoxDecoration(
-              color: cardBlend,
-              borderRadius: borderRadius,
-              border: Border.all(color: borderColor),
-            ),
-            child: useLooseStack
-                ? Stack(
-                    fit: StackFit.loose,
-                    alignment: Alignment.center,
-                    clipBehavior: Clip.none,
-                    children: [
-                      Positioned.fill(child: starfieldLayer),
-                      tapTargetForStack,
-                    ],
-                  )
-                : Stack(
-                    fit: StackFit.expand,
-                    children: [starfieldLayer, tapTarget],
+            final labelRow = Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (showSpinner) ...[
+                  SizedBox(
+                    width: metrics.buttonLoadingSpinnerSlotSize,
+                    height: metrics.buttonLoadingSpinnerSlotSize,
+                    child: TermosLoadingIndicator(
+                      size: metrics.buttonLoadingSpinnerSize,
+                      color: accentColor,
+                    ),
                   ),
-          );
-        } else {
-          final inner = Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: tapEnabled ? widget.onTap : null,
-              borderRadius: borderRadius,
-              child: Container(
+                  SizedBox(width: metrics.buttonIconSpacing),
+                ] else if (displayIcon != null) ...[
+                  TermosIconSlot(
+                    icon: displayIcon,
+                    tintColor: contentColor,
+                    slotSize: metrics.buttonIconSize,
+                  ),
+                  SizedBox(width: metrics.buttonIconSpacing),
+                ],
+                if (widget.multilineLabel)
+                  Flexible(
+                    child: overrideLabel != null
+                        ? Text(overrideLabel)
+                        : widget.label,
+                  )
+                else if (overrideLabel != null)
+                  Text(overrideLabel)
+                else
+                  widget.label,
+              ],
+            );
+            final labelWithSidePadding = expandsForLayout
+                ? (widget.multilineLabel
+                      ? Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: metrics.buttonHorizontalPadding,
+                          ),
+                          child: labelRow,
+                        )
+                      : labelRow)
+                : Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: metrics.buttonHorizontalPadding,
+                    ),
+                    child: labelRow,
+                  );
+            final content = DefaultTextStyle.merge(
+              style: textStyles.terminalHeader(contentColor),
+              child: expandsForLayout
+                  ? Center(child: labelWithSidePadding)
+                  : Align(
+                      alignment: Alignment.center,
+                      widthFactor: 1.0,
+                      heightFactor: 1.0,
+                      child: labelWithSidePadding,
+                    ),
+            );
+
+            final borderRadius =
+                widget.borderRadius ??
+                BorderRadius.circular(metrics.borderRadius);
+            final cardBlend = Color.lerp(
+              colors.background,
+              colors.card,
+              isLight
+                  ? buttonEffects.cardBlendLight
+                  : buttonEffects.cardBlendDark,
+            )!;
+
+            final Widget decorated;
+            if (useHeavyVisualEffects) {
+              final shrinkTap = !expandsForLayout && fixedWidth == null;
+              final tapTargetChild = widget.multilineLabel && expandsForLayout
+                  ? ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: effectiveHeight),
+                      child: content,
+                    )
+                  : content;
+              final tapTarget = TermosTapTarget(
+                controller:
+                    widget.typingLoadingTransition &&
+                        !isSaved &&
+                        !isTransitioning
+                    ? _dotGridController
+                    : null,
+                onTap: tapEnabled ? widget.onTap : null,
+                enabled:
+                    tapEnabled ||
+                    (widget.typingLoadingTransition && widget.isLoading),
+                borderRadius: borderRadius,
+                primaryColor: accentColor,
+                blobRadius: dg.blobRadius,
+                dotSize: dg.dotSize,
+                gridSpacing: dg.spacing,
+                idleMeshColor: colors.dotGridIdleMesh,
+                shrinkWrapWidth: shrinkTap,
+                child: tapTargetChild,
+              );
+
+              final starfieldLayer = ClipRRect(
+                borderRadius: borderRadius,
+                child: TermosAlignedBuilder(
+                  builder: (gridOffset) => CustomPaint(
+                    painter: ReactiveStarfieldPainter(
+                      dotSize: dg.dotSize,
+                      gridSpacing: dg.spacing,
+                      glowPosition: starfield.glowPositionButton,
+                      glowColor: glowColor,
+                      intensity: glowIntensity,
+                      gridOffset: gridOffset,
+                      seed: _starfieldSeed,
+                      glowRadiusFraction: starfield.glowRadiusFraction,
+                    ),
+                  ),
+                ),
+              );
+
+              // When [multilineLabel] is enabled, the button height is driven by
+              // the wrapped label, so the parent may pass unbounded vertical
+              // constraints. [StackFit.expand] requires bounded constraints, so
+              // fall back to the loose / [Positioned.fill] composition that the
+              // non-expand branch already uses — the starfield fills the content
+              // box while the row drives the intrinsic size. With expandWidth we
+              // also need to force the tap target to fill the available width
+              // (loose stack would otherwise let it shrink to the row's natural
+              // width).
+              final useLooseStack = !expandsForLayout || widget.multilineLabel;
+              final Widget tapTargetForStack =
+                  widget.multilineLabel && expandsForLayout
+                  ? SizedBox(width: effectiveWidth, child: tapTarget)
+                  : tapTarget;
+              decorated = Container(
                 decoration: BoxDecoration(
                   color: cardBlend,
                   borderRadius: borderRadius,
                   border: Border.all(color: borderColor),
                 ),
-                child: content,
-              ),
-            ),
-          );
-          decorated = widget.expandWidth ? inner : IntrinsicWidth(child: inner);
-        }
-
-        return decorated;
-      },
-    );
-
-    final semanticLabel = overrideLabel ?? widget.label.data ?? '';
-    final interactive = Listener(
-      onPointerDown: tapEnabled
-          ? (_) {
-              // Updating pressed state synchronously rebuilds InkWell /
-              // TermosTapTarget during pointer dispatch and cancels the inner
-              // tap (often feels like «first tap does nothing»). Defer layout
-              // until after this frame while still cancelling if pointer is
-              // released before paint.
-              _deferPressedFrame = true;
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (!mounted) return;
-                if (!_deferPressedFrame) return;
-                setState(() => _pressed = true);
-              });
+                child: useLooseStack
+                    ? Stack(
+                        fit: StackFit.loose,
+                        alignment: Alignment.center,
+                        clipBehavior: Clip.none,
+                        children: [
+                          Positioned.fill(child: starfieldLayer),
+                          tapTargetForStack,
+                        ],
+                      )
+                    : Stack(
+                        fit: StackFit.expand,
+                        children: [starfieldLayer, tapTarget],
+                      ),
+              );
+            } else {
+              final inner = Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: tapEnabled ? widget.onTap : null,
+                  borderRadius: borderRadius,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: cardBlend,
+                      borderRadius: borderRadius,
+                      border: Border.all(color: borderColor),
+                    ),
+                    child: content,
+                  ),
+                ),
+              );
+              decorated = expandsForLayout
+                  ? inner
+                  : IntrinsicWidth(child: inner);
             }
-          : null,
-      onPointerUp: (_) {
-        _deferPressedFrame = false;
-        if (!_pressed) return;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) setState(() => _pressed = false);
-        });
+
+            return decorated;
+          },
+        );
+
+        final semanticLabel = overrideLabel ?? widget.label.data ?? '';
+        final interactive = Listener(
+          onPointerDown: tapEnabled
+              ? (_) {
+                  // Updating pressed state synchronously rebuilds InkWell /
+                  // TermosTapTarget during pointer dispatch and cancels the inner
+                  // tap (often feels like «first tap does nothing»). Defer layout
+                  // until after this frame while still cancelling if pointer is
+                  // released before paint.
+                  _deferPressedFrame = true;
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (!mounted) return;
+                    if (!_deferPressedFrame) return;
+                    setState(() => _pressed = true);
+                  });
+                }
+              : null,
+          onPointerUp: (_) {
+            _deferPressedFrame = false;
+            if (!_pressed) return;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) setState(() => _pressed = false);
+            });
+          },
+          onPointerCancel: (_) {
+            _deferPressedFrame = false;
+            if (!_pressed) return;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) setState(() => _pressed = false);
+            });
+          },
+          child: MouseRegion(
+            onEnter: tapEnabled ? (_) => setState(() => _hovered = true) : null,
+            onExit: (_) => setState(() => _hovered = false),
+            child: animatedBuilder,
+          ),
+        );
+        final Widget sized = widget.multilineLabel
+            ? ConstrainedBox(
+                constraints: BoxConstraints(minHeight: effectiveHeight),
+                child: SizedBox(width: effectiveWidth, child: interactive),
+              )
+            : SizedBox(
+                height: effectiveHeight,
+                width: effectiveWidth,
+                child: interactive,
+              );
+        return Semantics(
+          button: true,
+          enabled: tapEnabled,
+          label: semanticLabel,
+          child: sized,
+        );
       },
-      onPointerCancel: (_) {
-        _deferPressedFrame = false;
-        if (!_pressed) return;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) setState(() => _pressed = false);
-        });
-      },
-      child: MouseRegion(
-        onEnter: tapEnabled ? (_) => setState(() => _hovered = true) : null,
-        onExit: (_) => setState(() => _hovered = false),
-        child: animatedBuilder,
-      ),
-    );
-    final Widget sized = widget.multilineLabel
-        ? ConstrainedBox(
-            constraints: BoxConstraints(minHeight: effectiveHeight),
-            child: SizedBox(width: effectiveWidth, child: interactive),
-          )
-        : SizedBox(
-            height: effectiveHeight,
-            width: effectiveWidth,
-            child: interactive,
-          );
-    return Semantics(
-      button: true,
-      enabled: tapEnabled,
-      label: semanticLabel,
-      child: sized,
     );
   }
 }
